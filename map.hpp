@@ -81,41 +81,52 @@ namespace	ft
 		size_type	max_size() const	{ return this->_tree.max_size(); };
 
 		/* Modifiers */
-			ft::pair<iterator,bool> insert (const value_type& val)
-			{
-				ft::pair<iterator, bool> r;
-				if (this->_tree.insert(val))
-					r.second = false;
-				else
-					r.second = true;
-				NodePtr p = search(val.first);
-				r.first = iterator(p);
-				return (r);
-			}
-			template <class InputIterator>
-  			void insert (InputIterator first, InputIterator last)
-			{
-				for (; first != last; first++)
-					this->_tree.insert(*first);				
-			}
 
-			void erase (iterator position)
-			{
-				this->_tree.delete_node(*position.first);
-			}
+		ft::pair<iterator,bool> insert (const value_type& val)
+		{
+			ft::pair<iterator, bool> r;
+			if (this->_tree.insert(val))
+				r.second = false;
+			else
+				r.second = true;
+			NodePtr p = search(val.first);
+			r.first = iterator(p);
+			return (r);
+		}
+		template <class InputIterator>
+		void insert (InputIterator first, InputIterator last)
+		{
+			for (; first != last; first++)
+				this->_tree.insert(*first);				
+		}
 
-			void erase (iterator first, iterator last)
-			{
-				for (; first != last; first++)
-					this->erase(first);
-			}
+		iterator insert (iterator position, const value_type& val)
+		{
+			return (insert(val).first);
+		}
 
-			size_type erase (const key_type& k){
-				this->_tree.delete_node(k);
-				return (1);
-			}
+		void erase (iterator position)
+		{
+			this->_tree.delete_node(*position.first);
+		}
 
-			void clear() {this->_tree.clear();};
+		void erase (iterator first, iterator last)
+		{
+			for (; first != last; first++)
+				this->erase(first);
+		}
+
+		size_type erase (const key_type& k){
+			this->_tree.delete_node(k);
+			return (1);
+		}
+
+		void swap( map& other )
+		{
+			this->_tree.swap(other._tree);
+		}
+
+		void clear() {this->_tree.clear();};
 
 		/* Access Elements */
 
@@ -131,12 +142,49 @@ namespace	ft
 			return (p->data.second);
 		}
 
+		mapped_type& at (const key_type& k)
+		{
+			NodePtr	target;
+			
+			target = this->_tree.search(k);
+			if (target != this->_tree.NIL)
+				return (target->data.second);
+			std::cout << "YEAH" << std::endl;
+			throw(std::out_of_range("Element not Found 404"));
+		}
+
+		const mapped_type& at (const key_type& k) const
+		{
+			NodePtr	target;
+			
+			target = this->_tree.search(k);
+			if (target != this->_tree.NIL)
+				return (target->data.second);
+			throw(std::out_of_range("Element not Found 404"));
+		}
+		
+		/* Observers */
+
+		key_compare key_comp() const		{ return (_comp); }
+		value_compare value_comp() const	{ return (value_compare()) }
+
+		/* Operations */
+
+		iterator 								find(const key_type& k) 				{ return (this->_tree.find(k)); }
+		const_iterator							find(const key_type& k)	const			{ return (this->_tree.find(k)); }
+		size_type								count(const key_type& k) const			{ return (this->_tree.count_unique(k)); }
+		iterator								lower_bound( const key_type& k) 		{ return (this->_tree.lower_bound(k)); }
+		const_iterator							lower_bound( const key_type& k) const	{ return (this->_tree.lower_bound(k)); }
+		iterator								upper_bound (const key_type& k)			{ return (this->_tree.upper_bound(k)); }
+		const_iterator 							upper_bound (const key_type& k) const	{ return (this->_tree.upper_bound(k)); }
+		ft::pair<iterator,iterator>				equal_range (const key_type& k)			{ return (this->_tree.equal_range_unique(k)); }
+		ft::pair<const_iterator,const_iterator> equal_range (const key_type& k)	const	{ return (this->_tree.equal_range_unique(k)); }
+
 		/* Allocator */
 		
 		allocator_type get_allocator() const
 		{
 			return (this->_alloc);
 		}
-
 	};
 };

@@ -57,7 +57,7 @@ namespace ft
 
 		node_pointer		base() const				{ return this->_it; };
 		reference			operator*() const	{ return _getPredecessor(this->_it)->data; };
-		pointer				operator->() const	{ return &(this->_it->data); };
+		pointer				operator->() const	{ return &(_getPredecessor(this->_it)->data); };
 		mapRevIterator&		operator++()		{ this->_it = _getPredecessor(this->_it); return (*this); };
 		mapRevIterator		operator++(int)	{ mapRevIterator temp(*this); ++(*this); return (temp); };
 		mapRevIterator&		operator--()	{ this->_it = _getSuccessor(this->_it); return (*this); };

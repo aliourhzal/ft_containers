@@ -305,21 +305,21 @@ namespace ft
 				child->parent = _P->parent;
 			}
 
-			nodePtr	minimum(nodePtr	root)
+			nodePtr	minimum(nodePtr	root) const
 			{
 				while(root->left != this->NIL)
 					root = root->left;
 				return (root);
 			}
 
-			nodePtr	maximum(nodePtr	root)
+			nodePtr	maximum(nodePtr	root) const
 			{
 				while(root->right != this->NIL)
 					root = root->right;
 				return (root);
 			}
 
-			nodePtr	search(key_type k)
+			nodePtr	search(key_type k) const
 			{
 				nodePtr	r = this->root;
 				while (r->data.first != k && r != this->NIL)
@@ -402,6 +402,96 @@ namespace ft
 					delete_node(this->root->data.first);
 					this->_size--;
 				}
+			}
+
+			void	swap(_Rb_tree& other)
+			{
+				_Rb_tree tmp;
+
+				for (iterator i = other.begin(); i != other.end(); i++)
+					tmp.insert(*i);
+				other.clear();
+				for (iterator i = this->begin(); i != this->end(); i++)
+					other.insert(*i);
+				this->clear();
+				for (iterator i = tmp.begin(); i != tmp.end(); i++)
+					this->insert(*i);
+			}
+
+			/*-------- Operations --------*/
+			
+			iterator	find(const key_type& k)
+			{
+				return (iterator(this->search(k)));
+			}
+
+			const_iterator	find(const key_type& k) const
+			{
+				return (const_iterator(this->search(k)));
+			}
+
+			size_type	count_unique(const key_type& k) const
+			{
+				nodePtr i;
+
+				i = this->search(k);
+				if (i != this->NIL)
+					return (1);
+				return (0);
+			}
+
+			iterator	lower_bound(const key_type& k)
+			{
+				iterator i;
+			
+				i = this->begin();
+				while(this->_cmp(i->first, k) && i != this->end())
+					i++;
+				return (i);
+			}
+
+			const_iterator lower_bound(const key_type& k) const
+			{
+				const_iterator i;
+				
+				i = this->begin();
+				while(this->_comp(i->first, k) && i != this->end())
+					i++;
+				return (i);
+			}
+
+			iterator upper_bound(const key_type& k)
+			{
+				iterator i;
+				
+				i = this->begin();
+				while(this->_comp(i->first, k) && i != this->end())
+					i++;
+				if (i->first == k)
+					i++;
+				return (i);
+			}
+
+			const_iterator upper_bound (const key_type& key) const
+			{
+				const_iterator i;
+				
+				i = this->begin();
+				while(this->_comp(i->first, key) && i != this->end())
+					i++;
+				if (i->first == key)
+					i++;
+				return (i);
+			}
+
+			ft::pair<iterator,iterator>	equal_range_unique (const key_type& k)
+			{
+				return (ft::make_pair<iterator,iterator>(this->lower_bound(k), this->upper_bound(k)));
+			}
+
+			ft::pair<const_iterator,const_iterator> equal_range_unique (const key_type& k) const
+			{
+				return (ft::make_pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k)));
 			}
 	};
 	
