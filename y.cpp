@@ -15,6 +15,7 @@ class RedBlackTree {
    public:
   NodePtr root;
   NodePtr TNULL;
+  int   size;
 
   void initializeNULLNode(NodePtr node, NodePtr parent) {
     node->data = 0;
@@ -183,6 +184,7 @@ class RedBlackTree {
     if (y_original_color == 0) {
       deleteFix(x);
     }
+    this->size--;
   }
 
   // For balancing the tree after insertion
@@ -248,6 +250,8 @@ class RedBlackTree {
     }
   }
 
+/********************PUBLIC***********************/
+
    public:
   RedBlackTree() {
     TNULL = new Node;
@@ -255,8 +259,17 @@ class RedBlackTree {
     TNULL->left = nullptr;
     TNULL->right = nullptr;
     root = TNULL;
+    this->size = 0;
   }
-
+  ~RedBlackTree()
+  {
+    while (this->size > 0)
+    {
+      this->deleteNode(this->root->data);
+      printTree();
+    }
+    
+  }
   void preorder() {
     preOrderHelper(this->root);
   }
@@ -390,6 +403,7 @@ class RedBlackTree {
     }
 
     insertFix(node);
+    this->size++;
   }
 
   NodePtr getRoot() {
@@ -409,20 +423,16 @@ class RedBlackTree {
 
 int main() {
   RedBlackTree bst;
-  bst.insert(10);
-  bst.insert(18);
-  bst.insert(7);
-  bst.insert(15);
-  bst.insert(16);
-  bst.insert(30);
-  bst.insert(25);
-  bst.insert(40);
-  bst.insert(60);
-  bst.insert(2);
+  bst.insert(6);
+  bst.insert(3);
   bst.insert(1);
-  bst.insert(70);
-  bst.printTree();
+  bst.insert(4);
+  bst.insert(8);
+  bst.insert(2);
+  bst.insert(5);
+  bst.insert(7);
+  bst.insert(0);
 
-  NodePtr n = bst.successor(bst.searchTree(15));
-  std::cout << "successor: " << n->data << std::endl;
+  // NodePtr n = bst.successor(bst.searchTree(15));
+  // std::cout << "successor: " << n->data << std::endl;
 }

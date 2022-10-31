@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include "iterators.hpp"
 #include "is_integral.hpp"

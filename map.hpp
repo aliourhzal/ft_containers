@@ -7,7 +7,7 @@
 
 namespace	ft
 {
-	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<std::pair<const Key,T> >>
+	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<std::pair<const Key,T> > >
 	class map
 	{
 		public:
@@ -96,7 +96,7 @@ namespace	ft
   			void insert (InputIterator first, InputIterator last)
 			{
 				for (; first != last; first++)
-					this->_tree.insert(*first)				
+					this->_tree.insert(*first);				
 			}
 
 			void erase (iterator position)
@@ -126,7 +126,7 @@ namespace	ft
 			p = this->_tree.search(k);
 			if (p != this->_tree.NIL)
 				return (p->data.second);
-			this->_tree.insert(std::pair<key_type, mapped_type>(k, mapped_type()));
+			this->_tree.insert(ft::pair<key_type, mapped_type>(k, mapped_type()));
 			p = this->_tree.search(k);
 			return (p->data.second);
 		}

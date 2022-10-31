@@ -35,7 +35,7 @@ namespace ft
 			typedef ptrdiff_t 				difference_type;
 			typedef _Alloc 					allocator_type;
 		private:
-			typedef typename    _Alloc::template rebind<Node<T>>::other		node_allocator;
+			typedef typename    _Alloc::template rebind<Node<T> >::other		node_allocator;
 			typedef Node<value_type>										node_type;
 			typedef node_type*												nodePtr;
 			typedef typename	value_type::first_type						key_type;
@@ -226,8 +226,8 @@ namespace ft
 			const_iterator			begin() const 	{return const_iterator(minimum(this->root));}
 			iterator				end()			{return iterator(this->NIL);}
 			const_iterator			end() const		{return const_iterator(this->NIL);}
-			reverse_iterator		rbegin()		{return reverse_iterator(this->NIL);}
-			const_reverse_iterator	rbegin() const	{return const_reverse_iterator(this->NIL);}
+			reverse_iterator		rbegin()		{return reverse_iterator(maximum(this->root));}
+			const_reverse_iterator	rbegin() const	{return const_reverse_iterator(maximum(this->root));}
 			reverse_iterator		rend()			{return reverse_iterator(this->minimum(this->root));}
 			const_reverse_iterator	rend() const	{return const_reverse_iterator(this->minimum(this->root));}
 			
@@ -256,7 +256,7 @@ namespace ft
 			}
 			int	insert(value_type	data)
 			{
-				static int i = 0;
+				nodePtr last;
 				nodePtr	new_Node = this->_alloc.allocate(1);
 				this->_alloc.construct(new_Node, data);
 				new_Node->color = RED;
@@ -289,6 +289,8 @@ namespace ft
 					this->_maintain_Insert(new_Node);
 				}
 				this->_size++;
+				last = maximum(this->root);
+				last->right->parent = last;
 				return 0;
 			}
 
@@ -404,21 +406,42 @@ namespace ft
 	};
 	
 	template <class NodePtr>
+	NodePtr	minimum(NodePtr	root)
+	{
+		while(root->left->left)
+			root = root->left;
+		return (root);
+	}
+
+	template <class NodePtr>
+	NodePtr	maximum(NodePtr	root)
+	{
+		while(root->right->right)
+			root = root->right;
+		return (root);
+	}
+
+	template <class NodePtr>
 	NodePtr	_getSuccessor(NodePtr node) {
-		if (node->right)
-			return _getMin(node->right);
+		NodePtr	last;
+
+		last = node;
+		if (node->right && node->right->right)
+			return minimum(node->right);
 		NodePtr	temp = node->parent;
 		while (temp && node == temp->right) {
 			node = temp;
 			temp = temp->parent;
 		}
+		if (!temp)
+			return (last->right);
 		return temp;
 	};
 
 	template <class NodePtr>
 	NodePtr	_getPredecessor(NodePtr node) {
-		if (node->left)
-			return _getMax(node->left);
+		if (node->left && node->left->left)
+			return maximum(node->left);
 		NodePtr	temp = node->parent;
 		while (temp && node == temp->left) {
 			node = temp;
