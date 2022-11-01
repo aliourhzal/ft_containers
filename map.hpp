@@ -3,6 +3,7 @@
 #include <iostream>
 #include "_Rb_tree.hpp"
 #include "vector/pair.hpp"
+#include "vector/lexi_equal.hpp"
 
 
 namespace	ft
@@ -166,7 +167,7 @@ namespace	ft
 		/* Observers */
 
 		key_compare key_comp() const		{ return (_comp); }
-		value_compare value_comp() const	{ return (value_compare()) }
+		value_compare value_comp() const	{ return (value_compare()); }
 
 		/* Operations */
 
@@ -187,4 +188,35 @@ namespace	ft
 			return (this->_alloc);
 		}
 	};
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (!(lhs == rhs));
+	}
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	}
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (lhs < rhs || lhs == rhs);
+	}
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (!(lhs <= rhs));
+	}
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs )
+	{
+		return (!(lhs < rhs));
+	}
 };
