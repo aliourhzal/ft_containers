@@ -2,7 +2,6 @@
 
 #include "vector/pair.hpp"
 #include <iostream>
-#include "iterators.hpp"
 
 # define RED 1
 # define BLACK 0
@@ -25,26 +24,21 @@ namespace ft
 	class   _Rb_tree
 	{
 		public:
-			typedef T						value_type;
-			typedef Compare					key_compare;
-			typedef value_type* 			pointer;
-			typedef const value_type* 		const_pointer;
-			typedef value_type& 			reference;
-			typedef const value_type& 		const_reference;
-			typedef size_t 					size_type;
-			typedef ptrdiff_t 				difference_type;
-			typedef _Alloc 					allocator_type;
+			typedef T														value_type;
+			typedef Compare													key_compare;
+			typedef value_type* 											pointer;
+			typedef const value_type* 										const_pointer;
+			typedef value_type& 											reference;
+			typedef const value_type& 										const_reference;
+			typedef size_t 													size_type;
+			typedef ptrdiff_t 												difference_type;
+			typedef _Alloc 													allocator_type;
 		private:
-			typedef typename    _Alloc::template rebind<Node<T> >::other		node_allocator;
+			typedef typename    _Alloc::template rebind<Node<T> >::other	node_allocator;
 			typedef Node<value_type>										node_type;
 			typedef node_type*												nodePtr;
 			typedef typename	value_type::first_type						key_type;
 			typedef typename	value_type::second_type						mapped_type;
-		public:
-			typedef ft::mapIterator<pointer, nodePtr>						iterator;
-			typedef ft::mapIterator<const_pointer, nodePtr>					const_iterator;
-			typedef ft::mapRevIterator<pointer, nodePtr>					reverse_iterator;
-			typedef ft::mapRevIterator<const_pointer, nodePtr>				const_reverse_iterator;
 		private:
 			size_type	_size;
 			nodePtr root;
@@ -67,6 +61,7 @@ namespace ft
 				child->left = x;
 				x->parent = child;
 			}
+
 			void	_right_Rotation(nodePtr	x)
 			{
 				nodePtr child = x->left;
@@ -220,16 +215,12 @@ namespace ft
 				this->NIL->right = nullptr;
 				this->root = this->NIL;
 			}
-			/* Iterators */
+			/* nodePtrs */
 
-			iterator				begin()			{return iterator(minimum(this->root));}
-			const_iterator			begin() const 	{return const_iterator(minimum(this->root));}
-			iterator				end()			{return iterator(this->NIL);}
-			const_iterator			end() const		{return const_iterator(this->NIL);}
-			reverse_iterator		rbegin()		{return reverse_iterator(maximum(this->root));}
-			const_reverse_iterator	rbegin() const	{return const_reverse_iterator(maximum(this->root));}
-			reverse_iterator		rend()			{return reverse_iterator(this->minimum(this->root));}
-			const_reverse_iterator	rend() const	{return const_reverse_iterator(this->minimum(this->root));}
+			nodePtr		begin()			{return (minimum(this->root));}
+			nodePtr		begin() const 	{return (minimum(this->root));}
+			nodePtr		end()			{return (this->NIL);}
+			nodePtr		end() const		{return (this->NIL);}
 			
 			void printHelper(nodePtr root, std::string indent, bool last)
 			{
@@ -262,6 +253,7 @@ namespace ft
 				new_Node->color = RED;
 				new_Node->left = this->NIL;
 				new_Node->right = this->NIL;
+				new_Node->parent = nullptr;
 				if (this->root == this->NIL)
 				{
 					new_Node->color = BLACK;
@@ -408,26 +400,26 @@ namespace ft
 			{
 				_Rb_tree tmp;
 
-				for (iterator i = other.begin(); i != other.end(); i++)
+				for (nodePtr i = other.begin(); i != other.end(); i++)
 					tmp.insert(*i);
 				other.clear();
-				for (iterator i = this->begin(); i != this->end(); i++)
+				for (nodePtr i = this->begin(); i != this->end(); i++)
 					other.insert(*i);
 				this->clear();
-				for (iterator i = tmp.begin(); i != tmp.end(); i++)
+				for (nodePtr i = tmp.begin(); i != tmp.end(); i++)
 					this->insert(*i);
 			}
 
 			/*-------- Operations --------*/
 			
-			iterator	find(const key_type& k)
+			nodePtr	find(const key_type& k)
 			{
-				return (iterator(this->search(k)));
+				return (nodePtr(this->search(k)));
 			}
 
-			const_iterator	find(const key_type& k) const
+			nodePtr	find(const key_type& k) const
 			{
-				return (const_iterator(this->search(k)));
+				return (nodePtr(this->search(k)));
 			}
 
 			size_type	count_unique(const key_type& k) const
@@ -440,9 +432,9 @@ namespace ft
 				return (0);
 			}
 
-			iterator	lower_bound(const key_type& k)
+			nodePtr	lower_bound(const key_type& k)
 			{
-				iterator i;
+				nodePtr i;
 			
 				i = this->begin();
 				while(this->_cmp(i->first, k) && i != this->end())
@@ -450,9 +442,9 @@ namespace ft
 				return (i);
 			}
 
-			const_iterator lower_bound(const key_type& k) const
+			nodePtr lower_bound(const key_type& k) const
 			{
-				const_iterator i;
+				nodePtr i;
 				
 				i = this->begin();
 				while(this->_comp(i->first, k) && i != this->end())
@@ -460,9 +452,9 @@ namespace ft
 				return (i);
 			}
 
-			iterator upper_bound(const key_type& k)
+			nodePtr upper_bound(const key_type& k)
 			{
-				iterator i;
+				nodePtr i;
 				
 				i = this->begin();
 				while(this->_comp(i->first, k) && i != this->end())
@@ -472,9 +464,9 @@ namespace ft
 				return (i);
 			}
 
-			const_iterator upper_bound (const key_type& key) const
+			nodePtr upper_bound (const key_type& key) const
 			{
-				const_iterator i;
+				nodePtr i;
 				
 				i = this->begin();
 				while(this->_comp(i->first, key) && i != this->end())
@@ -484,14 +476,14 @@ namespace ft
 				return (i);
 			}
 
-			ft::pair<iterator,iterator>	equal_range_unique (const key_type& k)
+			ft::pair<nodePtr,nodePtr>	equal_range_unique (const key_type& k)
 			{
-				return (ft::make_pair<iterator,iterator>(this->lower_bound(k), this->upper_bound(k)));
+				return (ft::make_pair<nodePtr,nodePtr>(this->lower_bound(k), this->upper_bound(k)));
 			}
 
-			ft::pair<const_iterator,const_iterator> equal_range_unique (const key_type& k) const
+			ft::pair<nodePtr,nodePtr> equal_range_unique (const key_type& k) const
 			{
-				return (ft::make_pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k)));
+				return (ft::make_pair<nodePtr,nodePtr>(lower_bound(k), upper_bound(k)));
 			}
 	};
 	

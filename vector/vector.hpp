@@ -7,31 +7,29 @@
 
 namespace ft 
 {
-	template<typename T, class _Alloc = std::allocator<T>>
+	template<typename T, class _Alloc = std::allocator<T> >
 	class vector
 	{
 		public:
 			typedef _Alloc								allocator_type;
-			typedef T									value_type;
 			typedef typename _Alloc::size_type			size_type;
 			typedef typename _Alloc::difference_type	difference_type;
 			typedef typename _Alloc::pointer			pointer;
 			typedef typename _Alloc::const_pointer		const_pointer;
 			typedef typename _Alloc::reference			reference;
 			typedef typename _Alloc::const_reference	const_reference;
-			typedef	VectorIterator<pointer>				iterator;
-			typedef VectorIterator<const_pointer>		const_iterator;
-			typedef	RevectorIterator<pointer>			reverse_iterator;
-			typedef RevectorIterator<const_iterator>	const_reverse_iterator;
+			typedef T									value_type;
+			typedef	pointer								iterator;
+			typedef const_pointer						const_iterator;
 		private:
 			allocator_type	_alloc;
-			value_type*		_m_data;
+			pointer			_m_data;
 			size_type		_size;
 			size_type		_capacity;
 
-			value_type*	_reallocate(size_type	n)
+			pointer	_reallocate(size_type	n)
 			{
-				value_type* tmp;
+				pointer tmp;
 
 				tmp = this->_alloc.allocate(n);
 				for (size_t i = 0; i < this->size(); i++)
@@ -120,29 +118,25 @@ namespace ft
 
 			iterator				begin(){return (iterator(this->_m_data));}
 			iterator				end(){return (iterator(this->begin() + this->_size));}
-			const_iterator			begin() const{return (const_iterator(this->_m_data));}
-			const_iterator			end() const{return (const_Iterator(this->begin() + this->_size));}
-			reverse_iterator			rbegin() {return (RevectorIterator(this->_m_data + this->size()));}
-			reverse_iterator			rend() {return (RevectorIterator(this->_m_data));}
-			const_reverse_iterator	rbegin() const{return (RevectorIterator(this->_m_data + this->size()));}
-			const_reverse_iterator	rend() const{return (RevectorIterator(this->_m_data));}
+			const_iterator			begin() const {return (const_iterator(this->_m_data));}
+			const_iterator			end() const {return (const_iterator(this->begin() + this->_size));}
 		/* Capacity */
-			size_type	size() const noexcept
+			size_type	size() const _NOEXCEPT
 			{
 				return (this->_size);
 			}
 
-			size_type	max_size() const noexcept
+			size_type	max_size() const _NOEXCEPT
 			{
 				return (this->_alloc.max_size());
 			}
 
-			size_type	capacity() const noexcept
+			size_type	capacity() const _NOEXCEPT
 			{
 				return (this->_capacity);
 			}
 
-			bool	empty() const noexcept
+			bool	empty() const _NOEXCEPT
 			{
 				return (this->_size == 0);
 			}
@@ -247,10 +241,10 @@ namespace ft
 
 			void insert (iterator position, size_type n, const value_type& val)
 			{
-				difference_type ip = position - this->begin();iterator erase (iterator first, iterator last);iterator erase (iterator first, iterator last);iterator erase (iterator first, iterator last);
-				
-				while (this->size() + n > this->capacity())
-					this->reserve(this->_capacity * 2);
+				difference_type ip = position - this->begin();
+			
+				if (this->_size + n > this->_capacity)
+					(this->_size + n < (this->capacity() * 2) ? this->reserve(this->capacity() * 2) : this->reserve(this->size() + n));
 				for (size_t i = this->_size - 1; i >= ip; i--)
 					this->_m_data[i + n] = this->_m_data[i];
 				for (size_t i = ip; i < ip + n; i++)
@@ -263,6 +257,7 @@ namespace ft
 			{
 				difference_type len = last - first;
 				difference_type n = position - this->begin();
+			
 				if (this->_size + len > this->_capacity)
 					(this->_size + len) > (this->_capacity * 2) ? this->reserve(this->_size + len) : this->reserve(this->_capacity * 2);
 				for (size_t i = this->_size - 1; i >= n; i--)

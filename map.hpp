@@ -4,11 +4,11 @@
 #include "_Rb_tree.hpp"
 #include "vector/pair.hpp"
 #include "vector/lexi_equal.hpp"
-
+#include "iterators.hpp"
 
 namespace	ft
 {
-	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<std::pair<const Key,T> > >
+	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map
 	{
 		public:
@@ -29,10 +29,8 @@ namespace	ft
 			typedef	_Rb_tree<value_type, key_compare, Alloc>		Tree_type;
 
 		public:
-			typedef typename Tree_type::iterator					iterator;
-			typedef typename Tree_type::const_iterator				const_iterator;
-			typedef typename Tree_type::reverse_iterator			reverse_iterator;
-			typedef typename Tree_type::const_reverse_iterator		const_reverse_iterator;
+			typedef typename ft::mapIterator<value_type, NodePtr>			iterator;
+			typedef typename ft::mapIterator<const value_type, NodePtr>		const_iterator;
 
 			class	value_compare
 			{
@@ -59,21 +57,24 @@ namespace	ft
 
 			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _comp(comp){}
 			template <class InputIterator>
-			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+				map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 			: _tree(comp, alloc), _comp(comp) { this->insert(first, last); };
 			map(const map& x) { *this = x; };
 			~map() {this->clear();}
+			map& operator=( const map& other )
+			{
+				this->clear();
+				for (iterator it = other.begin(); it != other.end(); it++)
+					this->insert(*it);
+				return (*this);
+			}
 
 		/* Iterators */
 
-		iterator 				begin() 		{return (this->_tree.begin());}
-		const_iterator 			begin() const 	{return (this->_tree.begin());}
-		iterator				end() 			{return (this->_tree.end());}
-		const_iterator			end() const 	{return (this->_tree.end());}
-		reverse_iterator		rbegin()		{return (this->_tree.rbegin());}
-		const_reverse_iterator	rbegin() const	{return (this->_tree.rbegin());}
-		reverse_iterator		rend()			{return (this->_tree.rend());}
-		const_reverse_iterator	rend() const	{return (this->_tree.rend());}
+		iterator 				begin() 		{return iterator(this->_tree.begin());}
+		const_iterator 			begin() const 	{return const_iterator(this->_tree.begin());}
+		iterator				end()			{return iterator(this->_tree.end());}
+		const_iterator			end() const 	{return const_iterator(this->_tree.end());}
 
 		/* Capacity */
 
@@ -90,7 +91,7 @@ namespace	ft
 				r.second = false;
 			else
 				r.second = true;
-			NodePtr p = search(val.first);
+			NodePtr p = this->_tree.search(val.first);
 			r.first = iterator(p);
 			return (r);
 		}
@@ -150,7 +151,6 @@ namespace	ft
 			target = this->_tree.search(k);
 			if (target != this->_tree.NIL)
 				return (target->data.second);
-			std::cout << "YEAH" << std::endl;
 			throw(std::out_of_range("Element not Found 404"));
 		}
 
