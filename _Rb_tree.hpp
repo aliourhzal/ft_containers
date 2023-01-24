@@ -364,6 +364,9 @@ namespace ft
 				}
 				this->_alloc.destroy(node);
 				this->_alloc.deallocate(node, 1);
+				node->left = nullptr;
+				node->right = nullptr;
+				node->parent = nullptr;
 				if (origrinalColor == BLACK)
 					_maintain_Delete(x);
 			}
@@ -455,7 +458,7 @@ namespace ft
 			nodePtr upper_bound(const key_type& k)
 			{
 				nodePtr i;
-				
+
 				i = this->begin();
 				while(this->_comp(i->first, k) && i != this->end())
 					i++;
@@ -483,7 +486,7 @@ namespace ft
 
 			ft::pair<nodePtr,nodePtr> equal_range_unique (const key_type& k) const
 			{
-				return (ft::make_pair<nodePtr,nodePtr>(lower_bound(k), upper_bound(k)));
+				return (ft::make_pair<nodePtr,nodePtr>(this->lower_bound(k), this->upper_bound(k)));
 			}
 	};
 	

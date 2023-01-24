@@ -109,13 +109,17 @@ namespace	ft
 
 		void erase (iterator position)
 		{
-			this->_tree.delete_node(*position.first);
+			this->_tree.delete_node(position->first);
 		}
 
 		void erase (iterator first, iterator last)
 		{
-			for (; first != last; first++)
-				this->erase(first);
+			iterator tmp;
+			while (first != last)
+			{
+				tmp = first++;
+				this->erase(tmp);
+			}
 		}
 
 		size_type erase (const key_type& k){
@@ -134,20 +138,13 @@ namespace	ft
 
 		mapped_type& operator[] (const key_type& k)
 		{
-			NodePtr	p;
-
-			p = this->_tree.search(k);
-			if (p != this->_tree.NIL)
-				return (p->data.second);
-			this->_tree.insert(ft::pair<key_type, mapped_type>(k, mapped_type()));
-			p = this->_tree.search(k);
-			return (p->data.second);
+			return ((this->insert(ft::make_pair(k,mapped_type())).first->second));
 		}
 
 		mapped_type& at (const key_type& k)
 		{
 			NodePtr	target;
-			
+
 			target = this->_tree.search(k);
 			if (target != this->_tree.NIL)
 				return (target->data.second);
@@ -157,11 +154,11 @@ namespace	ft
 		const mapped_type& at (const key_type& k) const
 		{
 			NodePtr	target;
-			
+
 			target = this->_tree.search(k);
 			if (target != this->_tree.NIL)
 				return (target->data.second);
-			throw(std::out_of_range("Element not Found 404"));
+			throw(std::out_of_range("Element not Found 404"));	
 		}
 		
 		/* Observers */
@@ -220,3 +217,27 @@ namespace	ft
 		return (!(lhs < rhs));
 	}
 };
+
+
+/*
+R----3(BLACK)
+   L----1(BLACK)
+   |  L----0(BLACK)
+   |  R----2(BLACK)
+   R----5(BLACK)
+      L----4(BLACK)
+      R----7(RED)
+         L----6(BLACK)
+         R----8(BLACK)
+            R----9(RED)
+
+R----5(BLACK)
+   L----3(BLACK)
+   |  L----2(BLACK)
+   |  |  L----0(RED)
+   |  R----4(BLACK)
+   R----7(BLACK)
+      L----6(BLACK)
+      R----8(BLACK)
+         R----9(RED)
+*/
