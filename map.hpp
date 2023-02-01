@@ -5,6 +5,7 @@
 #include "vector/pair.hpp"
 #include "vector/lexi_equal.hpp"
 #include "iterators.hpp"
+#include "reverse_iterator.hpp"
 
 namespace	ft
 {
@@ -31,6 +32,8 @@ namespace	ft
 		public:
 			typedef typename ft::mapIterator<value_type, NodePtr>			iterator;
 			typedef typename ft::mapIterator<const value_type, NodePtr>		const_iterator;
+			typedef typename ft::reverse_iterator<iterator>					reverse_iterator;
+			typedef typename ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 
 			class	value_compare
 			{
@@ -71,10 +74,15 @@ namespace	ft
 
 		/* Iterators */
 
-		iterator 				begin() 		{return iterator(this->_tree.begin());}
-		const_iterator 			begin() const 	{return const_iterator(this->_tree.begin());}
-		iterator				end()			{return iterator(this->_tree.end());}
-		const_iterator			end() const 	{return const_iterator(this->_tree.end());}
+		iterator 					begin() 			{return iterator(this->_tree.begin());}
+		const_iterator 				begin()		const 	{return const_iterator(this->_tree.begin());}
+		iterator					end()				{return iterator(this->_tree.end());}
+		const_iterator				end()		const 	{return const_iterator(this->_tree.end());}
+		reverse_iterator			rbegin()			{return (reverse_iterator(end()));}
+		reverse_iterator			rend()				{return (reverse_iterator(begin()));}
+		const_reverse_iterator		rbegin()	const	{return (const_reverse_iterator(end()));}
+		const_reverse_iterator		rend()		const	{return (const_reverse_iterator(begin()));}
+
 
 		/* Capacity */
 
@@ -102,15 +110,9 @@ namespace	ft
 				this->_tree.insert(*first);				
 		}
 
-		iterator insert (iterator position, const value_type& val)
-		{
-			return (insert(val).first);
-		}
+		iterator insert (iterator position, const value_type& val) { return (insert(val).first);}
 
-		void erase (iterator position)
-		{
-			this->_tree.delete_node(position->first);
-		}
+		void erase (iterator position) { this->_tree.delete_node(position->first); }
 
 		void erase (iterator first, iterator last)
 		{
@@ -127,10 +129,7 @@ namespace	ft
 			return (1);
 		}
 
-		void swap( map& other )
-		{
-			this->_tree.swap(other._tree);
-		}
+		void swap( map& other ) { this->_tree.swap(other._tree);}
 
 		void clear() {this->_tree.clear();};
 

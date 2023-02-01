@@ -207,6 +207,7 @@ namespace ft
 
 		public:
 			nodePtr NIL;
+			nodePtr STR;
 			_Rb_tree(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _cmp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
@@ -245,6 +246,45 @@ namespace ft
 					printHelper(this->root, "", true);
 				}
 			}
+
+			void	switchPositions(nodePtr	_P, nodePtr	child) //move subtree within he tree
+			{
+				if (_P->parent == nullptr)
+					this->root = child;
+				else if (_P == _P->parent->left)
+					_P->parent->left = child;
+				else
+					_P->parent->right = child;
+				child->parent = _P->parent;
+			}
+
+			nodePtr	minimum(nodePtr	root) const
+			{
+				while(root->left != this->NIL)
+					root = root->left;
+				return (root);
+			}
+
+			nodePtr	maximum(nodePtr	root) const
+			{
+				while(root->right != this->NIL)
+					root = root->right;
+				return (root);
+			}
+
+			nodePtr	search(key_type k) const
+			{
+				nodePtr	r = this->root;
+				while (r->data.first != k && r != this->NIL)
+				{
+					if (k < r->data.first)
+						r = r->left;
+					else if (k > r->data.first)
+						r = r->right;
+				}
+				return (r);
+			}
+
 			int	insert(value_type	data)
 			{
 				nodePtr last;
@@ -286,49 +326,12 @@ namespace ft
 				return 0;
 			}
 
-			void	switchPositions(nodePtr	_P, nodePtr	child)
-			{
-				if (_P->parent == nullptr)
-					this->root = child;
-				else if (_P == _P->parent->left)
-					_P->parent->left = child;
-				else
-					_P->parent->right = child;
-				child->parent = _P->parent;
-			}
-
-			nodePtr	minimum(nodePtr	root) const
-			{
-				while(root->left != this->NIL)
-					root = root->left;
-				return (root);
-			}
-
-			nodePtr	maximum(nodePtr	root) const
-			{
-				while(root->right != this->NIL)
-					root = root->right;
-				return (root);
-			}
-
-			nodePtr	search(key_type k) const
-			{
-				nodePtr	r = this->root;
-				while (r->data.first != k && r != this->NIL)
-				{
-					if (k < r->data.first)
-						r = r->left;
-					else if (k > r->data.first)
-						r = r->right;
-				}
-				return (r);
-			}
-
 			void	delete_node(key_type	key)
 			{
-				nodePtr node = this->root;
+				nodePtr node;
 				nodePtr	x;
 				nodePtr	y;
+				nodePtr	last;
 				node = this->search(key);
 				if (node == this->NIL)
 					return;
@@ -337,12 +340,12 @@ namespace ft
 				if (node->left == this->NIL)
 				{
 					x = node->right;
-					switchPositions(node, node->right);
+					switchPositions(node, x);
 				}
 				else if (node->right == this->NIL)
 				{
 					x = node->left;
-					switchPositions(node, node->left);
+					switchPositions(node, x);
 				}
 				else
 				{
@@ -364,39 +367,28 @@ namespace ft
 				}
 				this->_alloc.destroy(node);
 				this->_alloc.deallocate(node, 1);
-				node->left = nullptr;
-				node->right = nullptr;
-				node->parent = nullptr;
 				if (origrinalColor == BLACK)
 					_maintain_Delete(x);
+				this->_size--;
+				if (this->_size > 0)
+				{
+					last = maximum(this->root);
+					last->right->parent = last;
+				}
 			}
 
 			/* Capacity */
 
-			bool empty() const
-			{
-				return (this->_size == 0);
-			}
-
-			size_type size() const
-			{
-				return (this->_size);
-			}
-
-			size_type max_size() const
-			{
-				return (this->_alloc.max_size());
-			}
+			bool		empty()		const { return (this->_size == 0); }
+			size_type	size()		const { return (this->_size); }
+			size_type	max_size()	const { return (this->_alloc.max_size()); }
 
 			/* Modifiers */
 
 			void clear()
 			{
 				while (this->_size > 0)
-				{
 					delete_node(this->root->data.first);
-					this->_size--;
-				}
 			}
 
 			void	swap(_Rb_tree& other)
@@ -415,15 +407,8 @@ namespace ft
 
 			/*-------- Operations --------*/
 			
-			nodePtr	find(const key_type& k)
-			{
-				return (nodePtr(this->search(k)));
-			}
-
-			nodePtr	find(const key_type& k) const
-			{
-				return (nodePtr(this->search(k)));
-			}
+			nodePtr	find(const key_type& k) 		{ return (nodePtr(this->search(k))); }
+			nodePtr	find(const key_type& k)	const	{ return (nodePtr(this->search(k))); }
 
 			size_type	count_unique(const key_type& k) const
 			{
@@ -535,3 +520,33 @@ namespace ft
 		return temp;
 	};
 };
+
+/*
+	maintain tree after insertion (maintainInsert(x)):
+		4 scenarios of red black tree insertion violations:
+			1- Z is root;
+			2- Z.uncle is RED;
+			3- Z.uncle is BLACK(triangle)
+			4- Z.uncle is BLACK(line)
+
+			SOLUTIONS:
+				1- color Z black;
+				2- recolor Z.parent, Z.uncle, Z.GP, Z = Z.GP;
+				3- rotate Z.parent in the opposite direction of Z
+				4- rotate Z.GP in the opposite direction of Z and recolor the original parent and GP of Z  
+	
+	maintain tree after deletion (maintainDelete(x)):
+		let w = x.sibling;
+		4 scenarios of red black tree deletion violations:
+			1- w is RED;
+			2- w is BLACK and w.left and w.right are BLACK;
+			3- w is BLACK and w.left is RED and w.right is BLACK;
+			4- w is BLACK and w.right is RED;
+
+			SOLUTIONS:
+				1- recolor w and w.parent and rotate w.parent in the opposite direction of w then w = x.sibling;
+				2- w.color = RED and x = x.p
+				3- recolor w.left and w, rotate w in the same direction, w = x.sibling;
+				4- recolor w and w.parent and w.(the same direction of w) then rotate x.parent in the opposite direction of w
+		
+*/

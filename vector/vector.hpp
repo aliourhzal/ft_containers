@@ -1,9 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include "iterators.hpp"
 #include "is_integral.hpp"
 #include "lexi_equal.hpp"
+#include "../reverse_iterator.hpp"
 
 namespace ft 
 {
@@ -11,16 +11,18 @@ namespace ft
 	class vector
 	{
 		public:
-			typedef _Alloc								allocator_type;
-			typedef typename _Alloc::size_type			size_type;
-			typedef typename _Alloc::difference_type	difference_type;
-			typedef typename _Alloc::pointer			pointer;
-			typedef typename _Alloc::const_pointer		const_pointer;
-			typedef typename _Alloc::reference			reference;
-			typedef typename _Alloc::const_reference	const_reference;
-			typedef T									value_type;
-			typedef	pointer								iterator;
-			typedef const_pointer						const_iterator;
+			typedef _Alloc									allocator_type;
+			typedef typename _Alloc::size_type				size_type;
+			typedef typename _Alloc::difference_type		difference_type;
+			typedef typename _Alloc::pointer				pointer;
+			typedef typename _Alloc::const_pointer			const_pointer;
+			typedef typename _Alloc::reference				reference;
+			typedef typename _Alloc::const_reference		const_reference;
+			typedef T										value_type;
+			typedef	pointer									iterator;
+			typedef const_pointer							const_iterator;
+			typedef	ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		private:
 			allocator_type	_alloc;
 			pointer			_m_data;
@@ -116,10 +118,15 @@ namespace ft
 			}
 		/* Iterators */
 
-			iterator				begin(){return (iterator(this->_m_data));}
-			iterator				end(){return (iterator(this->begin() + this->_size));}
-			const_iterator			begin() const {return (const_iterator(this->_m_data));}
-			const_iterator			end() const {return (const_iterator(this->begin() + this->_size));}
+			iterator					begin()				{return (iterator(this->_m_data));}
+			iterator					end()				{return (iterator(this->begin() + this->_size));}
+			const_iterator				begin()		const	{return (const_iterator(this->_m_data));}
+			const_iterator				end()		const	{return (const_iterator(this->begin() + this->_size));}
+			reverse_iterator			rbegin()			{return (reverse_iterator(end()));}
+			reverse_iterator			rend()				{return (reverse_iterator(begin()));}
+			const_reverse_iterator		rbegin()	const	{return (const_reverse_iterator(end()));}
+			const_reverse_iterator		rend()		const	{return (const_reverse_iterator(begin()));}
+
 		/* Capacity */
 			size_type	size() const _NOEXCEPT
 			{
