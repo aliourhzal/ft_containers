@@ -125,7 +125,8 @@ namespace	ft
 		}
 
 		size_type erase (const key_type& k){
-			this->_tree.delete_node(k);
+			if (!this->_tree.delete_node(k))
+				return (0);
 			return (1);
 		}
 
@@ -216,27 +217,3 @@ namespace	ft
 		return (!(lhs < rhs));
 	}
 };
-
-
-/*
-R----3(BLACK)
-   L----1(BLACK)
-   |  L----0(BLACK)
-   |  R----2(BLACK)
-   R----5(BLACK)
-      L----4(BLACK)
-      R----7(RED)
-         L----6(BLACK)
-         R----8(BLACK)
-            R----9(RED)
-
-R----5(BLACK)
-   L----3(BLACK)
-   |  L----2(BLACK)
-   |  |  L----0(RED)
-   |  R----4(BLACK)
-   R----7(BLACK)
-      L----6(BLACK)
-      R----8(BLACK)
-         R----9(RED)
-*/

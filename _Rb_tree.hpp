@@ -42,7 +42,7 @@ namespace ft
 		private:
 			size_type	_size;
 			nodePtr root;
-			key_compare	_cmp;
+			key_compare	_comp;
 			node_allocator _alloc;
 
 			void    _left_Rotation(nodePtr   x)
@@ -205,16 +205,36 @@ namespace ft
 				x->color = BLACK;
 			}
 
+			nodePtr	_getSuccessor(nodePtr node)
+			{
+				nodePtr	last;
+
+				last = node;
+				if (node->right && node->right->right)
+					return minimum(node->right);
+				nodePtr	temp = node->parent;
+				while (temp && node == temp->right && node != temp->left) {
+					node = temp;
+					temp = temp->parent;
+				}
+				if (!temp)
+					return (last->right);
+				return temp;
+			};
+		
 		public:
 			nodePtr NIL;
 			nodePtr STR;
-			_Rb_tree(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _cmp(comp), _alloc(alloc), _size(0)
+			_Rb_tree(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
 				this->NIL->color = BLACK;
 				this->NIL->left = nullptr;
 				this->NIL->right = nullptr;
 				this->root = this->NIL;
+			}
+			~_Rb_tree() {
+				this->clear();
 			}
 			/* nodePtrs */
 
@@ -260,14 +280,14 @@ namespace ft
 
 			nodePtr	minimum(nodePtr	root) const
 			{
-				while(root->left != this->NIL)
+				while(root != this->NIL && root->left != this->NIL)
 					root = root->left;
 				return (root);
 			}
 
 			nodePtr	maximum(nodePtr	root) const
 			{
-				while(root->right != this->NIL)
+				while(root != this->NIL && root->right != this->NIL)
 					root = root->right;
 				return (root);
 			}
@@ -306,15 +326,19 @@ namespace ft
 					while(x != this->NIL)
 					{
 						y = x;
-						if (this->_cmp(new_Node->data.first, x->data.first))
+						if (this->_comp(new_Node->data.first, x->data.first))
 							x = x->left;
-						else if (this->_cmp(x->data.first, new_Node->data.first))
+						else if (this->_comp(x->data.first, new_Node->data.first))
 							x = x->right;
 						else
+						{
+							this->_alloc.destroy(new_Node);
+							this->_alloc.deallocate(new_Node, 1);
 							return 1;
+						}
 					}
 					new_Node->parent = y;
-					if (this->_cmp(new_Node->data.first, y->data.first))
+					if (this->_comp(new_Node->data.first, y->data.first))
 						y->left = new_Node;
 					else
 						y->right = new_Node;
@@ -326,7 +350,7 @@ namespace ft
 				return 0;
 			}
 
-			void	delete_node(key_type	key)
+			int	delete_node(key_type	key)
 			{
 				nodePtr node;
 				nodePtr	x;
@@ -334,7 +358,7 @@ namespace ft
 				nodePtr	last;
 				node = this->search(key);
 				if (node == this->NIL)
-					return;
+					return (0);
 				int origrinalColor = node->color;
 				y = node;
 				if (node->left == this->NIL)
@@ -375,6 +399,7 @@ namespace ft
 					last = maximum(this->root);
 					last->right->parent = last;
 				}
+				return (1);
 			}
 
 			/* Capacity */
@@ -385,24 +410,45 @@ namespace ft
 
 			/* Modifiers */
 
-			void clear()
+			void destroyTree(nodePtr node)
 			{
-				while (this->_size > 0)
-					delete_node(this->root->data.first);
+				if (node->left != this->NIL)
+					destroyTree(node->left);
+				if (node->right != this->NIL)
+					destroyTree(node->right);
+				if (node != this->NIL)
+				{
+					if (node != this->root && node == node->parent->right)
+						node->parent->right = this->NIL;
+					if (node != this->root && node == node->parent->left)
+						node->parent->left = this->NIL;
+					if (node == this->root)
+						this->root = this->NIL;
+					this->_alloc.destroy(node);
+					this->_alloc.deallocate(node, 1);
+				}
+			}
+
+			void	clear()
+			{
+				if (this->root != this->NIL)
+					destroyTree(this->root);
+				this->_size = 0;
 			}
 
 			void	swap(_Rb_tree& other)
 			{
 				_Rb_tree tmp;
 
-				for (nodePtr i = other.begin(); i != other.end(); i++)
-					tmp.insert(*i);
+				for (nodePtr i = other.begin(); i != other.end(); i = this->_getSuccessor(i))
+					tmp.insert(i->data);
 				other.clear();
-				for (nodePtr i = this->begin(); i != this->end(); i++)
-					other.insert(*i);
+				for (nodePtr i = this->begin(); i != this->end(); i = this->_getSuccessor(i))
+					other.insert(i->data);
 				this->clear();
-				for (nodePtr i = tmp.begin(); i != tmp.end(); i++)
-					this->insert(*i);
+				for (nodePtr i = tmp.begin(); i != tmp.end(); i = this->_getSuccessor(i))
+					this->insert(i->data);
+				tmp.clear();
 			}
 
 			/*-------- Operations --------*/
@@ -425,8 +471,8 @@ namespace ft
 				nodePtr i;
 			
 				i = this->begin();
-				while(this->_cmp(i->first, k) && i != this->end())
-					i++;
+				while(this->_comp(i->data.first, k) && i != this->end())
+					i = this->_getSuccessor(i);
 				return (i);
 			}
 
@@ -435,8 +481,8 @@ namespace ft
 				nodePtr i;
 				
 				i = this->begin();
-				while(this->_comp(i->first, k) && i != this->end())
-					i++;
+				while(this->_comp(i->data.first, k) && i != this->end())
+					i = this->_getSuccessor(i);
 				return (i);
 			}
 
@@ -445,10 +491,10 @@ namespace ft
 				nodePtr i;
 
 				i = this->begin();
-				while(this->_comp(i->first, k) && i != this->end())
-					i++;
-				if (i->first == k)
-					i++;
+				while(this->_comp(i->data.first, k) && i != this->end())
+					i = this->_getSuccessor(i);
+				if (i->data.first == k)
+					i = this->_getSuccessor(i);
 				return (i);
 			}
 
@@ -457,10 +503,10 @@ namespace ft
 				nodePtr i;
 				
 				i = this->begin();
-				while(this->_comp(i->first, key) && i != this->end())
-					i++;
-				if (i->first == key)
-					i++;
+				while(this->_comp(i->data.first, key) && i != this->end())
+					i = this->_getSuccessor(i);
+				if (i->data.first == key)
+					i = this->_getSuccessor(i);
 				return (i);
 			}
 
@@ -499,7 +545,7 @@ namespace ft
 		if (node->right && node->right->right)
 			return minimum(node->right);
 		NodePtr	temp = node->parent;
-		while (temp && node == temp->right) {
+		while (temp && node == temp->right && node != temp->left) {
 			node = temp;
 			temp = temp->parent;
 		}
@@ -513,7 +559,7 @@ namespace ft
 		if (node->left && node->left->left)
 			return maximum(node->left);
 		NodePtr	temp = node->parent;
-		while (temp && node == temp->left) {
+		while (temp && node == temp->left && node != temp->right) {
 			node = temp;
 			temp = temp->parent;
 		}

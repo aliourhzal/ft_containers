@@ -21,10 +21,10 @@ namespace ft {
 			
 			iterator_type		base()			const	{return (this->_current);}
 			reference			operator*()		const	{iterator_type tmp(this->_current); return (*--tmp);}
-			pointer				operator->()	const	{return &(*this->_current);}
+			pointer				operator->()	const	{return (&operator*());}
 			reverse_iterator&	operator++()			{--this->_current; return (*this);}
 			reverse_iterator	operator++(int)			{reverse_iterator tmp(this->_current); --this->_current; return (tmp);}
-			reverse_iterator&	operator--()			{return (++this->_current);}
+			reverse_iterator&	operator--()			{++this->_current; return (*this);}
 			reverse_iterator	operator--(int)			{reverse_iterator tmp(this->_current); ++this->_current; return (tmp);}
 
 			bool	operator!=(const reverse_iterator& y) {return (this->_current != y._current);}
