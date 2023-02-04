@@ -224,7 +224,6 @@ namespace ft
 		
 		public:
 			nodePtr NIL;
-			nodePtr STR;
 			_Rb_tree(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
@@ -233,8 +232,14 @@ namespace ft
 				this->NIL->right = nullptr;
 				this->root = this->NIL;
 			}
+			_Rb_tree(nodePtr root)
+			{
+				this->root = root;
+			}
 			~_Rb_tree() {
 				this->clear();
+				this->_alloc.destroy(this->NIL);
+				this->_alloc.deallocate(this->NIL, 1);
 			}
 			/* nodePtrs */
 
@@ -297,9 +302,9 @@ namespace ft
 				nodePtr	r = this->root;
 				while (r->data.first != k && r != this->NIL)
 				{
-					if (k < r->data.first)
+					if (_comp(k, r->data.first))
 						r = r->left;
-					else if (k > r->data.first)
+					else
 						r = r->right;
 				}
 				return (r);
@@ -350,7 +355,7 @@ namespace ft
 				return 0;
 			}
 
-			int	delete_node(key_type	key)
+			int	delete_node(key_type&	key)
 			{
 				nodePtr node;
 				nodePtr	x;
@@ -436,19 +441,18 @@ namespace ft
 				this->_size = 0;
 			}
 
-			void	swap(_Rb_tree& other)
+			void	swap(_Rb_tree &other)
 			{
-				_Rb_tree tmp;
-
-				for (nodePtr i = other.begin(); i != other.end(); i = this->_getSuccessor(i))
-					tmp.insert(i->data);
-				other.clear();
-				for (nodePtr i = this->begin(); i != this->end(); i = this->_getSuccessor(i))
-					other.insert(i->data);
-				this->clear();
-				for (nodePtr i = tmp.begin(); i != tmp.end(); i = this->_getSuccessor(i))
-					this->insert(i->data);
-				tmp.clear();
+				nodePtr thisRoot = this->root;
+				nodePtr thisNIL = this->NIL;
+				int thisSize =	this->_size;
+				
+				this->root = other.root;
+				this->NIL = other.NIL;
+				this->_size = other._size;
+				other.root = thisRoot;
+				other.NIL = thisNIL;
+				other._size = thisSize;
 			}
 
 			/*-------- Operations --------*/

@@ -9,6 +9,14 @@
 
 namespace	ft
 {
+
+	template <class Arg1, class Arg2, class Result>
+	struct binary_function {
+		typedef Arg1 first_argument_type;
+		typedef Arg2 second_argument_type;
+		typedef Result result_type;
+	};
+
 	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map
 	{
@@ -35,20 +43,20 @@ namespace	ft
 			typedef typename ft::reverse_iterator<iterator>					reverse_iterator;
 			typedef typename ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 
-			class	value_compare
-			{
+			class value_compare : public ft::binary_function<value_type,value_type,bool>
+			{   // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 				friend class map;
 				protected:
 					Compare comp;
-					value_compare (Compare c) : comp(c) {}
+					value_compare (Compare c) : comp(c) {}  // constructed with map's comparison object
 				public:
 					typedef bool result_type;
 					typedef value_type first_argument_type;
 					typedef value_type second_argument_type;
-					bool operator() (const value_type& x, const value_type& y) const
-					{
-						return comp(x.first, y.first);
-					}
+				bool operator() (const value_type& x, const value_type& y) const
+				{
+					return comp(x.first, y.first);
+				}
 			};
 		private:
 			Tree_type	_tree;
@@ -130,7 +138,7 @@ namespace	ft
 			return (1);
 		}
 
-		void swap( map& other ) { this->_tree.swap(other._tree);}
+		void swap( map& other ) { this->_tree.swap(other._tree); }
 
 		void clear() {this->_tree.clear();};
 
