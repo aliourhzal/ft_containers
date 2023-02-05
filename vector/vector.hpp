@@ -94,7 +94,7 @@ namespace ft
 				this->_size = n;
 				this->_capacity = n;
 			}
-			vector (const vector& x)
+			vector (const vector& x) : _m_data(), _size(0), _capacity(0)
 			{
 				*this = x;
 			}
@@ -109,11 +109,10 @@ namespace ft
 			{
 				this->clear();
 				this->reserve(x.size());
-				for (size_t i = 0; i < x.size(); i++)/* code */
-				{
+				for (size_t i = 0; i < x.size(); i++)
 					this->_alloc.construct(this->_m_data + i, x[i]);
-				}
 				this->_size = x.size();
+				this->_capacity = x.capacity();
 				return (*this);
 			}
 		/* Iterators */
@@ -128,25 +127,10 @@ namespace ft
 			const_reverse_iterator		rend()		const	{return (const_reverse_iterator(begin()));}
 
 		/* Capacity */
-			size_type	size() const _NOEXCEPT
-			{
-				return (this->_size);
-			}
-
-			size_type	max_size() const _NOEXCEPT
-			{
-				return (this->_alloc.max_size());
-			}
-
-			size_type	capacity() const _NOEXCEPT
-			{
-				return (this->_capacity);
-			}
-
-			bool	empty() const _NOEXCEPT
-			{
-				return (this->_size == 0);
-			}
+			size_type	size() 		const _NOEXCEPT { return (this->_size);}
+			size_type	max_size() 	const _NOEXCEPT { return (this->_alloc.max_size());}
+			size_type	capacity() 	const _NOEXCEPT { return (this->_capacity); }
+			bool		empty() 	const _NOEXCEPT { return (this->_size == 0);}
 
 			void resize(size_type count, value_type value = value_type())
 			{
@@ -202,7 +186,7 @@ namespace ft
 			void	clear()
 			{
 				for (size_t i = 0; i < this->_size; i++)
-					_alloc.destroy(this->_m_data + i);
+					this->_alloc.destroy(this->_m_data + i);
 				this->_size = 0;
 			}
 
@@ -264,15 +248,24 @@ namespace ft
 			{
 				difference_type len = last - first;
 				difference_type n = position - this->begin();
-			
+
 				if (this->_size + len > this->_capacity)
 					(this->_size + len) > (this->_capacity * 2) ? this->reserve(this->_size + len) : this->reserve(this->_capacity * 2);
-				for (size_t i = this->_size - 1; i >= n; i--)
-					this->_m_data[i + len] = this->_m_data[i];
-				for (size_t i = n; i < n + len; i++)
-				{ 
-					this->_m_data[i] = *first;
-					first++;
+				try {
+					for (int i = this->_size - 1; i >= n; i--)
+						this->_m_data[i + len] = this->_m_data[i];
+					for (int i = n; i < n + len; i++)
+					{ 
+						this->_m_data[i] = *first;
+						first++;
+					}
+				}
+				catch (...)
+				{
+					erase(this->begin(), this->end());
+					this->_capacity = 0;
+					this->_size = 0;
+					return ;
 				}
 				this->_size += len;
 			}
@@ -303,11 +296,16 @@ namespace ft
 
 			void swap (vector& x)
 			{
-				vector	tmp(x);
-				x = *(this);
+				pointer	tmp = x._m_data;
+				int xSize = x._size;
+				int xCapacity = x._capacity;
+
+				x._m_data = this->_m_data;
 				x._capacity = this->_capacity;
-				*(this) = tmp;
-				this->_capacity = tmp._capacity;
+				x._size = this->_size;
+				this->_m_data = tmp;
+				this->_capacity = xCapacity;
+				this->_size = xSize;
 			}
 
 			allocator_type  get_allocator() const
