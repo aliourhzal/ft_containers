@@ -86,7 +86,7 @@ namespace ft
 			{
 				difference_type n = last - first;
 				this->_m_data = this->_alloc.allocate(n);
-				for (size_t i = 0; i < n; i++)
+				for (size_t i = 0; i < n && first != last ; i++)
 				{
 					this->_alloc.construct(this->_m_data + i, *first);
 					first++;
@@ -103,7 +103,7 @@ namespace ft
 				for (size_t i = 0; i < this->size(); i++)
 					this->_alloc.destroy(this->_m_data + i);
 				if (this->capacity())
-				this->_alloc.deallocate(this->_m_data, this->capacity());
+					this->_alloc.deallocate(this->_m_data, this->capacity());
 			}
 			vector& operator= (const vector& x)
 			{
@@ -151,10 +151,20 @@ namespace ft
 			}
 			void reserve( size_type new_cap )
 			{
+				if (new_cap > this->max_size())
+					throw (std::length_error("the new size exceeds the max size of the container"));
 				if (new_cap > this->capacity())
 				{
-					this->_m_data = _reallocate(new_cap);
-					this->_capacity = new_cap;
+					if (new_cap > this->capacity() * 2)
+					{
+						this->_m_data = _reallocate(new_cap);
+						this->_capacity = new_cap;
+					}
+					else
+					{
+						this->_m_data = _reallocate(this->capacity() * 2);
+						this->_capacity = this->capacity() * 2;
+					}
 				}
 			}
 			/* Access Elements */
@@ -216,8 +226,7 @@ namespace ft
 			{
 				difference_type n = position - this->begin();
 				
-				if (this->size() + 1 > this->capacity())
-					this->reserve(this->_capacity * 2);
+				this->reserve(this->size() + 1);
 				if (n >= this->size())
 				{
 					this->_size++;
@@ -234,8 +243,7 @@ namespace ft
 			{
 				difference_type ip = position - this->begin();
 			
-				if (this->_size + n > this->_capacity)
-					(this->_size + n < (this->capacity() * 2) ? this->reserve(this->capacity() * 2) : this->reserve(this->size() + n));
+				this->reserve(this->_size + n);
 				for (size_t i = this->_size - 1; i >= ip; i--)
 					this->_m_data[i + n] = this->_m_data[i];
 				for (size_t i = ip; i < ip + n; i++)
@@ -248,26 +256,31 @@ namespace ft
 			{
 				difference_type len = last - first;
 				difference_type n = position - this->begin();
-
-				if (this->_size + len > this->_capacity)
-					(this->_size + len) > (this->_capacity * 2) ? this->reserve(this->_size + len) : this->reserve(this->_capacity * 2);
-				try {
+				size_t oldCapacity = this->_capacity;
+				size_t oldSize = this->_size;
+				try
+				{
+					this->reserve(this->_size + len);
 					for (int i = this->_size - 1; i >= n; i--)
-						this->_m_data[i + len] = this->_m_data[i];
-					for (int i = n; i < n + len; i++)
+					{
+						this->_alloc.construct(this->_m_data + i + len, this->_m_data[i]);
+					}
+					for (int i = n; i < n + len && first != last; i++)
 					{ 
-						this->_m_data[i] = *first;
+						this->_alloc.construct(this->_m_data + i, *first);
+						this->_size++;
 						first++;
 					}
 				}
 				catch (...)
 				{
-					erase(this->begin(), this->end());
-					this->_capacity = 0;
-					this->_size = 0;
-					return ;
+					this->erase(position, position + len);
+					if (this->_size < 0)
+						this->_size = 0;
+					this->_alloc.deallocate(this->_m_data + this->_size, len);
+					this->_capacity -= len;
+					throw ;
 				}
-				this->_size += len;
 			}
 
 			iterator erase (iterator position)
