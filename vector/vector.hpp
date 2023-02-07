@@ -85,14 +85,22 @@ namespace ft
         	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, int>::type = 1)
 			{
 				difference_type n = last - first;
-				this->_m_data = this->_alloc.allocate(n);
-				for (size_t i = 0; i < n && first != last ; i++)
+				if (n > 0)
 				{
-					this->_alloc.construct(this->_m_data + i, *first);
-					first++;
+					this->_m_data = this->_alloc.allocate(n);
+					for (size_t i = 0; i < n && first != last ; i++)
+					{
+						this->_alloc.construct(this->_m_data + i, *first);
+						first++;
+					}
+					this->_size = n;
+					this->_capacity = n;
 				}
-				this->_size = n;
-				this->_capacity = n;
+				else
+				{
+					this->_size = 0;
+					this->_capacity = 0;
+				}
 			}
 			vector (const vector& x) : _m_data(), _size(0), _capacity(0)
 			{
@@ -104,6 +112,8 @@ namespace ft
 					this->_alloc.destroy(this->_m_data + i);
 				if (this->capacity())
 					this->_alloc.deallocate(this->_m_data, this->capacity());
+				this->_size = 0;
+				this->_capacity = 0;
 			}
 			vector& operator= (const vector& x)
 			{
@@ -255,18 +265,20 @@ namespace ft
     		void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type = true)
 			{
 				difference_type len = last - first;
+				if (len <= 0)
+					return ;
 				difference_type n = position - this->begin();
+				vector tmp(this->begin(), this->end());
 				size_t oldCapacity = this->_capacity;
 				size_t oldSize = this->_size;
+				int i = n;
 				try
 				{
 					this->reserve(this->_size + len);
 					for (int i = this->_size - 1; i >= n; i--)
-					{
 						this->_alloc.construct(this->_m_data + i + len, this->_m_data[i]);
-					}
-					for (int i = n; i < n + len && first != last; i++)
-					{ 
+					for (; i < n + len && first != last; i++)
+					{
 						this->_alloc.construct(this->_m_data + i, *first);
 						this->_size++;
 						first++;
@@ -274,11 +286,10 @@ namespace ft
 				}
 				catch (...)
 				{
-					this->erase(position, position + len);
-					if (this->_size < 0)
-						this->_size = 0;
-					this->_alloc.deallocate(this->_m_data + this->_size, len);
-					this->_capacity -= len;
+					this->~vector();
+					this->_m_data = tmp._m_data;
+					this->_size = 0;
+					this->_capacity = 0;
 					throw ;
 				}
 			}
@@ -287,9 +298,7 @@ namespace ft
 			{
 				difference_type n = position - this->begin();
 				for (size_t i = n; i < this->_size; i++)
-				{
 					this->_m_data[i] = this->_m_data[i + 1];
-				}
 				this->_alloc.destroy(this->_m_data + (this->_size - 1));
 				this->_size--;
 				return (position);
