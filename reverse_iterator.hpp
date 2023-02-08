@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include "vector/iterator_traits.hpp"
 
 namespace ft {
 
@@ -26,9 +27,17 @@ namespace ft {
 			reverse_iterator	operator++(int)			{reverse_iterator tmp(this->_current); --this->_current; return (tmp);}
 			reverse_iterator&	operator--()			{++this->_current; return (*this);}
 			reverse_iterator	operator--(int)			{reverse_iterator tmp(this->_current); ++this->_current; return (tmp);}
+			reverse_iterator	operator+( difference_type n ) const	{ reverse_iterator _tmp(*this); _tmp += n; return (_tmp); }
+			reverse_iterator	operator-( difference_type n ) const	{ reverse_iterator _tmp(*this); _tmp -= n; return (_tmp);}
+			reverse_iterator&	operator+=( difference_type n )	{this->_current -= n; return (*this);}
+			reverse_iterator&	operator-=( difference_type n )	{this->_current += n; return (*this);}
 
 			bool	operator!=(const reverse_iterator& y) {return (this->_current != y._current);}
 			bool	operator==(const reverse_iterator& y) {return (this->_current == y._current);}
+			bool	operator>(const reverse_iterator& y) {return (this->_current > y._current);}
+			bool	operator<(const reverse_iterator& y) {return (this->_current < y._current);}
+			bool	operator<=(const reverse_iterator& y) {return (this->_current <= y._current);}
+			bool	operator>=(const reverse_iterator& y) {return (this->_current >= y._current);}
 	};
 
 }
