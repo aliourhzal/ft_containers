@@ -279,14 +279,19 @@ namespace ft
 			{
 				difference_type n = position - this->begin();
 				
-				this->reserve(this->size() + 1);
+				if (this->_size + 1 >= this->_capacity)
+					this->reserve(this->size() + 1);
 				if (n >= this->size())
 				{
 					this->_size++;
 					return this->end();	
 				}
 				for (size_t i = this->_size - 1; i >= n; i--)
+				{
 					this->_m_data[i + 1] = this->_m_data[i];
+					if (i == 0)
+						break;
+				}
 				this->_m_data[n] = val;
 				this->_size++;
 				return (this->begin() + n);
@@ -295,10 +300,15 @@ namespace ft
 			void insert (iterator position, size_type n, const value_type& val)
 			{
 				difference_type ip = position - this->begin();
-			
+
 				this->reserve(this->_size + n);
 				for (size_t i = this->_size - 1; i >= ip; i--)
+				{
+
 					this->_m_data[i + n] = this->_m_data[i];
+					if (i == 0)
+						break;
+				}
 				for (size_t i = ip; i < ip + n; i++)
 					this->_m_data[i] = val;
 				this->_size += n;
