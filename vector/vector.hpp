@@ -1,10 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include "is_integral.hpp"
-#include "lexi_equal.hpp"
+#include "utility.hpp"
 #include "../reverse_iterator.hpp"
-#include "iterator_traits.hpp"
 
 namespace ft 
 {
@@ -13,6 +11,8 @@ namespace ft
 	class __wrap_iter
 	{
 		public:
+			typedef T													iterator_type;
+			typedef typename iterator_traits<T>::iterator_category		iterator_category;
 			typedef typename iterator_traits<T>::value_type				value_type;
 			typedef typename iterator_traits<T>::difference_type		difference_type;
 			typedef typename iterator_traits<T>::pointer				pointer;

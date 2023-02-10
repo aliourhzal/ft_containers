@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "vector/iterator_traits.hpp"
+#include "vector/utility.hpp"
 
 namespace ft {
 
@@ -9,6 +9,8 @@ namespace ft {
 	class reverse_iterator {
 		public:
 			typedef _Iter												iterator_type;
+			typedef typename iterator_traits<_Iter>::iterator_category	iterator_category;
+			typedef typename iterator_traits<_Iter>::value_type			value_type;
 			typedef typename iterator_traits<_Iter>::difference_type	difference_type;
 			typedef typename iterator_traits<_Iter>::reference			reference;
 			typedef typename iterator_traits<_Iter>::pointer			pointer;
