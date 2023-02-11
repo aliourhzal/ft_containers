@@ -25,7 +25,7 @@ namespace ft
 	{
 		public:
 			typedef T														value_type;
-			typedef Compare													key_compare;
+			typedef Compare													value_compare;
 			typedef value_type* 											pointer;
 			typedef const value_type* 										const_pointer;
 			typedef value_type& 											reference;
@@ -37,12 +37,10 @@ namespace ft
 			typedef typename    _Alloc::template rebind<Node<T> >::other	node_allocator;
 			typedef Node<value_type>										node_type;
 			typedef node_type*												nodePtr;
-			typedef typename	value_type::first_type						key_type;
-			typedef typename	value_type::second_type						mapped_type;
 		private:
 			size_type	_size;
 			nodePtr root;
-			key_compare	_comp;
+			value_compare	_comp;
 			node_allocator _alloc;
 
 			void    _left_Rotation(nodePtr   x)
@@ -224,7 +222,7 @@ namespace ft
 		
 		public:
 			nodePtr NIL;
-			_Rb_tree(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
+			_Rb_tree(const value_compare& comp, const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
 				this->NIL->color = BLACK;
@@ -297,15 +295,17 @@ namespace ft
 				return (root);
 			}
 
-			nodePtr	search(key_type k) const
+			nodePtr	search(value_type k) const
 			{
 				nodePtr	r = this->root;
-				while (r->data.first != k && r != this->NIL)
+				while (r != this->NIL)
 				{
-					if (_comp(k, r->data.first))
+					if (_comp(k, r->data))
 						r = r->left;
-					else
+					else if (_comp(r->data, k))
 						r = r->right;
+					else
+						break;
 				}
 				return (r);
 			}
@@ -331,9 +331,9 @@ namespace ft
 					while(x != this->NIL)
 					{
 						y = x;
-						if (this->_comp(new_Node->data.first, x->data.first))
+						if (this->_comp(new_Node->data, x->data))
 							x = x->left;
-						else if (this->_comp(x->data.first, new_Node->data.first))
+						else if (this->_comp(x->data, new_Node->data))
 							x = x->right;
 						else
 						{
@@ -343,7 +343,7 @@ namespace ft
 						}
 					}
 					new_Node->parent = y;
-					if (this->_comp(new_Node->data.first, y->data.first))
+					if (this->_comp(new_Node->data, y->data))
 						y->left = new_Node;
 					else
 						y->right = new_Node;
@@ -355,7 +355,7 @@ namespace ft
 				return 0;
 			}
 
-			int	delete_node(key_type&	key)
+			int	delete_node(const value_type&	key)
 			{
 				nodePtr node;
 				nodePtr	x;
@@ -457,10 +457,10 @@ namespace ft
 
 			/*-------- Operations --------*/
 			
-			nodePtr	find(const key_type& k) 		{ return (nodePtr(this->search(k))); }
-			nodePtr	find(const key_type& k)	const	{ return (nodePtr(this->search(k))); }
+			nodePtr	find(const value_type& k) 		{ return (nodePtr(this->search(k))); }
+			nodePtr	find(const value_type& k)	const	{ return (nodePtr(this->search(k))); }
 
-			size_type	count_unique(const key_type& k) const
+			size_type	count_unique(const value_type& k) const
 			{
 				nodePtr i;
 
@@ -470,56 +470,56 @@ namespace ft
 				return (0);
 			}
 
-			nodePtr	lower_bound(const key_type& k)
+			nodePtr	lower_bound(const value_type& k)
 			{
 				nodePtr i;
 			
 				i = this->begin();
-				while(this->_comp(i->data.first, k) && i != this->end())
+				while(this->_comp(i->data, k) && i != this->end())
 					i = this->_getSuccessor(i);
 				return (i);
 			}
 
-			nodePtr lower_bound(const key_type& k) const
+			nodePtr lower_bound(const value_type& k) const
 			{
 				nodePtr i;
 				
 				i = this->begin();
-				while(this->_comp(i->data.first, k) && i != this->end())
+				while(this->_comp(i->data, k) && i != this->end())
 					i = this->_getSuccessor(i);
 				return (i);
 			}
 
-			nodePtr upper_bound(const key_type& k)
+			nodePtr upper_bound(const value_type& key)
 			{
 				nodePtr i;
 
 				i = this->begin();
-				while(this->_comp(i->data.first, k) && i != this->end())
+				while(this->_comp(i->data, key) && i != this->end())
 					i = this->_getSuccessor(i);
-				if (i->data.first == k)
+				if (!this->_comp(key, i->data) && i != this->NIL)
 					i = this->_getSuccessor(i);
 				return (i);
 			}
 
-			nodePtr upper_bound (const key_type& key) const
+			nodePtr upper_bound (const value_type& key) const
 			{
 				nodePtr i;
 				
 				i = this->begin();
-				while(this->_comp(i->data.first, key) && i != this->end())
+				while(this->_comp(i->data, key) && i != this->end())
 					i = this->_getSuccessor(i);
-				if (i->data.first == key)
+				if (!this->_comp(key, i->data))
 					i = this->_getSuccessor(i);
 				return (i);
 			}
 
-			ft::pair<nodePtr,nodePtr>	equal_range_unique (const key_type& k)
+			ft::pair<nodePtr,nodePtr>	equal_range_unique (const value_type& k)
 			{
 				return (ft::make_pair<nodePtr,nodePtr>(this->lower_bound(k), this->upper_bound(k)));
 			}
 
-			ft::pair<nodePtr,nodePtr> equal_range_unique (const key_type& k) const
+			ft::pair<nodePtr,nodePtr> equal_range_unique (const value_type& k) const
 			{
 				return (ft::make_pair<nodePtr,nodePtr>(this->lower_bound(k), this->upper_bound(k)));
 			}
