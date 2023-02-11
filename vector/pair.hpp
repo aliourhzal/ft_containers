@@ -12,7 +12,7 @@ namespace ft
 		_T1 first;
 		_T2 second;
 		pair(){}
-		pair(first_type f, second_type s) : first(f), second(s){}
+		pair(first_type f, second_type s = second_type()) : first(f), second(s){}
 		template<class _A1, class _A2>
 		pair(pair<_A1, _A2> pr) : first(pr.first), second(pr.second){}
 		pair& operator= (const pair& pr)

@@ -49,7 +49,7 @@ namespace ft
 	template<typename _Tp>
 	struct iterator_traits<_Tp*>
 	{
-		typedef random_access_iterator_tag iterator_category;
+		// typedef random_access_iterator_tag iterator_category;
 		typedef _Tp                         value_type;
 		typedef ptrdiff_t                   difference_type;
 		typedef _Tp*                        pointer;
@@ -59,7 +59,7 @@ namespace ft
 	template<typename _Tp>
 	struct iterator_traits<const _Tp*>
 	{
-		typedef random_access_iterator_tag iterator_category;
+		// typedef random_access_iterator_tag iterator_category;
 		typedef _Tp							value_type;
 		typedef ptrdiff_t					difference_type;
 		typedef const _Tp*					pointer;
