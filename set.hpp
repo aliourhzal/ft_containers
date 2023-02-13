@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include "_Rb_tree.hpp"
-#include "vector/pair.hpp"
-#include "vector/utility.hpp"
+#include "pair.hpp"
+#include "utility.hpp"
 #include "iterators.hpp"
 #include "reverse_iterator.hpp"
 

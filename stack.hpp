@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../vector/vector.hpp"
+#include "vector.hpp"
 #include <stack>
 
 namespace ft

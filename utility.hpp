@@ -49,21 +49,21 @@ namespace ft
 	template<typename _Tp>
 	struct iterator_traits<_Tp*>
 	{
-		// typedef random_access_iterator_tag iterator_category;
-		typedef _Tp                         value_type;
-		typedef ptrdiff_t                   difference_type;
-		typedef _Tp*                        pointer;
-		typedef _Tp&                        reference;
+		typedef std::random_access_iterator_tag iterator_category;
+		typedef _Tp                         	value_type;
+		typedef ptrdiff_t                   	difference_type;
+		typedef _Tp*                        	pointer;
+		typedef _Tp&                        	reference;
 	};
 
 	template<typename _Tp>
 	struct iterator_traits<const _Tp*>
 	{
-		// typedef random_access_iterator_tag iterator_category;
-		typedef _Tp							value_type;
-		typedef ptrdiff_t					difference_type;
-		typedef const _Tp*					pointer;
-		typedef const _Tp&					reference;
+		typedef std::random_access_iterator_tag iterator_category;
+		typedef _Tp								value_type;
+		typedef ptrdiff_t						difference_type;
+		typedef const _Tp*						pointer;
+		typedef const _Tp&						reference;
 	};
 
 		template <class InputIterator1, class InputIterator2>

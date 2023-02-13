@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "utility.hpp"
-#include "../reverse_iterator.hpp"
+#include "reverse_iterator.hpp"
 
 namespace ft 
 {
@@ -26,7 +26,7 @@ namespace ft
 			template <typename It>
 			__wrap_iter(const __wrap_iter<It>& x) : _current(x.base()){}
 		
-			T 				base()							const	{return (this->_current);}
+			T				base()							const	{return (this->_current);}
 			reference 		operator*()						const	{ return (*_current);}
 			pointer 		operator->()					const	{ return (_current);}
 			__wrap_iter& 	operator++()							{ ++_current; return (*this);}
@@ -38,14 +38,14 @@ namespace ft
 			__wrap_iter  	operator- (difference_type _n)	const	{ __wrap_iter _tmp(*this); _tmp -= _n; return (_tmp); }
 			__wrap_iter&  	operator-= (difference_type _n)			{ _current -= _n; return (*this); }
 			reference    	operator[](difference_type _n)	const	{ return (_current[_n]); }
-			difference_type operator- ( __wrap_iter _n)	const	{ return (_current - _n._current); }
+			difference_type operator- ( __wrap_iter _n)		const	{ return (_current - _n._current); }
 
-			bool operator==(const __wrap_iter& _y) { return (_current == _y._current); }
-			bool operator!=(const __wrap_iter& _y) { return !(_current == _y._current); }
-			bool operator>(const __wrap_iter& _y) { return (_current > _y._current); }
-			bool operator<(const __wrap_iter& _y) { return (_current < _y._current); }
-			bool operator>=(const __wrap_iter& _y) { return !(_current < _y._current); }
-			bool operator<=(const __wrap_iter& _y) { return !(_current > _y._current); }
+			bool operator==(const __wrap_iter& _y)	{ return (_current == _y._current); }
+			bool operator!=(const __wrap_iter& _y)	{ return !(_current == _y._current); }
+			bool operator>(const __wrap_iter& _y)	{ return (_current > _y._current); }
+			bool operator<(const __wrap_iter& _y)	{ return (_current < _y._current); }
+			bool operator>=(const __wrap_iter& _y)	{ return !(_current < _y._current); }
+			bool operator<=(const __wrap_iter& _y)	{ return !(_current > _y._current); }
 	};
 
 	template <typename T, class _Alloc = std::allocator<T> >
@@ -149,10 +149,13 @@ namespace ft
 			}
 			~vector()
 			{
-				for (size_t i = 0; i < this->size(); i++)
-					this->_alloc.destroy(this->_m_data + i);
-				if (this->capacity())
-					this->_alloc.deallocate(this->_m_data, this->capacity());
+				if (this->_capacity)
+				{
+					for (size_t i = 0; i < this->size(); i++)
+						this->_alloc.destroy(this->_m_data + i);
+					if (this->capacity())
+						this->_alloc.deallocate(this->_m_data, this->capacity());
+				}
 				this->_size = 0;
 				this->_capacity = 0;
 			}
@@ -170,7 +173,11 @@ namespace ft
 			}
 		/* Iterators */
 
-			iterator					begin()				{return (iterator(this->_m_data));}
+			iterator					begin()				{
+				if (this->_size)
+					return (iterator(this->_m_data));
+				return (iterator(nullptr));
+			}
 			iterator					end()				{return (iterator(this->begin() + this->_size));}
 			const_iterator				begin()		const	{return (const_iterator(this->_m_data));}
 			const_iterator				end()		const	{return (const_iterator(this->begin() + this->_size));}
@@ -208,42 +215,48 @@ namespace ft
 					throw (std::length_error("the new size exceeds the max size of the container"));
 				if (new_cap > this->capacity())
 				{
-					if (new_cap > this->capacity() * 2)
-					{
 						this->_m_data = _reallocate(new_cap);
 						this->_capacity = new_cap;
-					}
-					else
-					{
-						this->_m_data = _reallocate(this->capacity() * 2);
-						this->_capacity = this->capacity() * 2;
-					}
 				}
 			}
 			/* Access Elements */
 
 			reference		operator[](size_type i) {return *(this->_m_data + i);}
 			const_reference	operator[](size_type i) const {return *(this->_m_data + i);}
-			reference		at(size_type i) {position_check(i); return *(this->_m_data + i);}
-			const_reference	at(size_type i) const {position_check(i); return *(this->_m_data + i);}
+			reference		at(size_type i)
+			{
+				if (i >= this->_size)
+					throw std::out_of_range("vector");
+				return *(this->_m_data + i);
+			}
+			const_reference	at(size_type i) const
+			{
+				if (i >= this->_size)
+					throw std::out_of_range("vector");
+				return *(this->_m_data + i);
+			}
 			reference 		front(){return *(this->begin());}
-			const_reference front() const{return *(this->begin());};
+			const_reference front() const{return *(this->begin());}
 			reference 		back(){return *(this->end() - 1);}
-			const_reference back() const{return *(this->end() - 1);};
+			const_reference back() const{return *(this->end() - 1);}
+			pointer			data() {return (this->_m_data);}
 			/* Modifiers */
 
 			void push_back( const value_type& value )
 			{
 				if (this->_size + 1 > this->_capacity)
-					(this->_capacity > 0) ? this->reserve(this->_capacity * 2) : this->reserve(1); 	
+					(this->_capacity > 0) ? this->reserve(this->_capacity * 2) : this->reserve(1);
 				this->_alloc.construct(this->_m_data + this->_size, value);
 				this->_size++;
 			}
 
 			void	pop_back()
 			{
-				this->_alloc.destroy(this->_m_data + this->_size - 1);
-				this->_size--;
+				if (this->_size)
+				{
+					this->_alloc.destroy(this->_m_data + this->_size - 1);
+					this->_size--;
+				}
 			}
 
 			void	clear()
@@ -312,12 +325,6 @@ namespace ft
 				for (size_t i = ip; i < ip + n; i++)
 					this->_m_data[i] = val;
 				this->_size += n;
-			}
-
-			template <typename K>
-			void print(K v) 
-			{
-				std::cout << v << std::endl;
 			}
 
 			template <class InputIterator>

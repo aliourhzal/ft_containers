@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vector/pair.hpp"
+#include "pair.hpp"
 #include <iostream>
 
 # define RED 1
