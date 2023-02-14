@@ -436,9 +436,13 @@ namespace ft
 
 			void	clear()
 			{
-				if (this->root != this->NIL)
-					destroyTree(this->root);
-				this->_size = 0;
+				std::cout << "hello" << std::endl;
+				if (this->_size)
+				{
+					if (this->root != this->NIL)
+						destroyTree(this->root);
+					this->_size = 0;
+				}
 			}
 
 			void	swap(_Rb_tree &other)

@@ -213,10 +213,15 @@ namespace ft
 			{
 				if (new_cap > this->max_size())
 					throw (std::length_error("the new size exceeds the max size of the container"));
-				if (new_cap > this->capacity())
+				if (new_cap > this->capacity() * 2)
 				{
-						this->_m_data = _reallocate(new_cap);
-						this->_capacity = new_cap;
+					this->_m_data = _reallocate(new_cap);
+					this->_capacity = new_cap;
+				}
+				else if (new_cap > this->capacity())
+				{
+					this->_m_data = _reallocate(this->_capacity * 2);
+					this->_capacity = this->_capacity * 2;
 				}
 			}
 			/* Access Elements */
