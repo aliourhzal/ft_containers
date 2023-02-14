@@ -319,6 +319,9 @@ namespace ft
 				new_Node->left = this->NIL;
 				new_Node->right = this->NIL;
 				new_Node->parent = nullptr;
+				last = maximum(this->root);
+				if (last->left != this->NIL)
+					last->left = this->NIL;
 				if (this->root == this->NIL)
 				{
 					new_Node->color = BLACK;
@@ -352,6 +355,8 @@ namespace ft
 				this->_size++;
 				last = maximum(this->root);
 				last->right->parent = last;
+				if (last->left != this->NIL)
+					last->left = nullptr;
 				return 0;
 			}
 
@@ -436,7 +441,6 @@ namespace ft
 
 			void	clear()
 			{
-				std::cout << "hello" << std::endl;
 				if (this->_size)
 				{
 					if (this->root != this->NIL)
@@ -564,6 +568,8 @@ namespace ft
 
 	template <class NodePtr>
 	NodePtr	_getPredecessor(NodePtr node) {
+		if (node->left && node->left->left == nullptr)
+			return (node->left);
 		if (node->left && node->left->left)
 			return maximum(node->left);
 		NodePtr	temp = node->parent;

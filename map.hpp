@@ -139,7 +139,7 @@ namespace	ft
 
 		void swap( map& other ) { this->_tree.swap(other._tree); }
 
-		void clear() {this->_tree.clear();};
+		void clear() { this->_tree.clear(); }
 
 		/* Access Elements */
 

@@ -29,7 +29,7 @@ namespace ft
 			mapIterator		operator++()  		{it = _getSuccessor(it); return mapIterator(it);}
 			mapIterator		operator++(int)  	{ mapIterator tmp = *this; it = _getSuccessor(it); return (tmp);}
 			mapIterator		operator--()  		{it = _getPredecessor(it); return mapIterator(it);}
-			mapIterator		operator--(int)  	{ mapIterator tmp = *this; it = _getPredecessor(it); return (tmp);}
+			mapIterator		operator--(int)  	{mapIterator tmp = *this; it = _getPredecessor(it); return (tmp);}
 
 			bool	operator==(const mapIterator &y) {return (this->it == y.it);}
 			bool	operator!=(const mapIterator &y) {return (this->it != y.it);}
