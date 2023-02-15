@@ -43,11 +43,34 @@ namespace ft
 			value_compare	_comp;
 			node_allocator _alloc;
 
+			void updateEdges()
+			{
+				nodePtr last;
+				nodePtr first;
+
+				last = maximum(this->root);
+				last->right->parent = last;
+				first = minimum(this->root);
+				first->left = this->STR;
+				this->STR->parent = first;
+			}
+
+			nodePtr newNode(value_type &data)
+			{
+				nodePtr	new_Node = this->_alloc.allocate(1);
+				this->_alloc.construct(new_Node, data);
+				new_Node->color = RED;
+				new_Node->left = this->NIL;
+				new_Node->right = this->NIL;
+				new_Node->parent = nullptr;
+				return (new_Node);
+			}
+
 			void    _left_Rotation(nodePtr   x)
 			{
 				nodePtr child = x->right;
 				x->right = child->left;
-				if (child->left != this->NIL)
+				if (child->left != this->NIL && child->left != this->STR)
 					child->left->parent = x;
 				child->parent = x->parent;
 				if(x->parent == nullptr)
@@ -222,12 +245,17 @@ namespace ft
 		
 		public:
 			nodePtr NIL;
+			nodePtr STR;
 			_Rb_tree(const value_compare& comp, const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
 				this->NIL->color = BLACK;
 				this->NIL->left = nullptr;
 				this->NIL->right = nullptr;
+				this->STR = this->_alloc.allocate(1);
+				this->STR->color = BLACK;
+				this->STR->left = this->STR;
+				this->STR->right = nullptr;
 				this->root = this->NIL;
 			}
 			_Rb_tree(nodePtr root)
@@ -238,6 +266,9 @@ namespace ft
 				this->clear();
 				this->_alloc.destroy(this->NIL);
 				this->_alloc.deallocate(this->NIL, 1);
+				this->_alloc.destroy(this->STR);
+				this->_alloc.deallocate(this->STR, 1);
+				//also deallocate STR
 			}
 			/* nodePtrs */
 
@@ -283,14 +314,16 @@ namespace ft
 
 			nodePtr	minimum(nodePtr	root) const
 			{
-				while(root != this->NIL && root->left != this->NIL)
+				while((root != this->NIL && root->left != this->NIL)
+						&& (root != this->STR && root->left != this->STR))
 					root = root->left;
 				return (root);
 			}
 
 			nodePtr	maximum(nodePtr	root) const
 			{
-				while(root != this->NIL && root->right != this->NIL)
+				while((root != this->NIL && root->right != this->NIL)
+						&& (root != this->STR && root->right != this->STR))
 					root = root->right;
 				return (root);
 			}
@@ -298,7 +331,7 @@ namespace ft
 			nodePtr	search(value_type k) const
 			{
 				nodePtr	r = this->root;
-				while (r != this->NIL)
+				while (r != this->NIL && r != this->STR)
 				{
 					if (_comp(k, r->data))
 						r = r->left;
@@ -312,16 +345,7 @@ namespace ft
 
 			int	insert(value_type	data)
 			{
-				nodePtr last;
-				nodePtr	new_Node = this->_alloc.allocate(1);
-				this->_alloc.construct(new_Node, data);
-				new_Node->color = RED;
-				new_Node->left = this->NIL;
-				new_Node->right = this->NIL;
-				new_Node->parent = nullptr;
-				last = maximum(this->root);
-				if (last->left != this->NIL)
-					last->left = this->NIL;
+				nodePtr	new_Node = newNode(data);
 				if (this->root == this->NIL)
 				{
 					new_Node->color = BLACK;
@@ -331,7 +355,7 @@ namespace ft
 				{
 					nodePtr	x = this->root;
 					nodePtr	y;
-					while(x != this->NIL)
+					while(x != this->NIL && x != this->STR)
 					{
 						y = x;
 						if (this->_comp(new_Node->data, x->data))
@@ -353,10 +377,7 @@ namespace ft
 					this->_maintain_Insert(new_Node);
 				}
 				this->_size++;
-				last = maximum(this->root);
-				last->right->parent = last;
-				if (last->left != this->NIL)
-					last->left = nullptr;
+				updateEdges();
 				return 0;
 			}
 
@@ -367,11 +388,11 @@ namespace ft
 				nodePtr	y;
 				nodePtr	last;
 				node = this->search(key);
-				if (node == this->NIL)
+				if (node == this->NIL || node == this->STR)
 					return (0);
 				int origrinalColor = node->color;
 				y = node;
-				if (node->left == this->NIL)
+				if (node->left == this->NIL || node->left == this->STR)
 				{
 					x = node->right;
 					switchPositions(node, x);
@@ -405,10 +426,7 @@ namespace ft
 					_maintain_Delete(x);
 				this->_size--;
 				if (this->_size > 0)
-				{
-					last = maximum(this->root);
-					last->right->parent = last;
-				}
+					updateEdges();
 				return (1);
 			}
 
@@ -422,9 +440,9 @@ namespace ft
 
 			void destroyTree(nodePtr node)
 			{
-				if (node->left != this->NIL)
+				if (node->left != this->NIL && node->left != this->STR)
 					destroyTree(node->left);
-				if (node->right != this->NIL)
+				if (node->right != this->NIL && node->right != this->STR)
 					destroyTree(node->right);
 				if (node != this->NIL)
 				{
@@ -441,25 +459,25 @@ namespace ft
 
 			void	clear()
 			{
-				if (this->_size)
-				{
-					if (this->root != this->NIL)
-						destroyTree(this->root);
-					this->_size = 0;
-				}
+				if (this->root != this->NIL)
+					destroyTree(this->root);
+				this->_size = 0;
 			}
 
 			void	swap(_Rb_tree &other)
 			{
 				nodePtr thisRoot = this->root;
 				nodePtr thisNIL = this->NIL;
+				nodePtr thisSTR = this->STR;
 				int thisSize =	this->_size;
 				
 				this->root = other.root;
 				this->NIL = other.NIL;
+				this->STR = other.STR;
 				this->_size = other._size;
 				other.root = thisRoot;
 				other.NIL = thisNIL;
+				other.STR = thisSTR;
 				other._size = thisSize;
 			}
 
@@ -536,7 +554,7 @@ namespace ft
 	template <class NodePtr>
 	NodePtr	minimum(NodePtr	root)
 	{
-		while(root->left->left)
+		while(root->left && root->left->left)
 			root = root->left;
 		return (root);
 	}
@@ -544,7 +562,7 @@ namespace ft
 	template <class NodePtr>
 	NodePtr	maximum(NodePtr	root)
 	{
-		while(root->right->right)
+		while(root->right && root->right->right)
 			root = root->right;
 		return (root);
 	}
@@ -568,8 +586,7 @@ namespace ft
 
 	template <class NodePtr>
 	NodePtr	_getPredecessor(NodePtr node) {
-		if (node->left && node->left->left == nullptr)
-			return (node->left);
+		// std::cout << "hello" << std::endl;
 		if (node->left && node->left->left)
 			return maximum(node->left);
 		NodePtr	temp = node->parent;
@@ -588,7 +605,6 @@ namespace ft
 			2- Z.uncle is RED;
 			3- Z.uncle is BLACK(triangle)
 			4- Z.uncle is BLACK(line)
-
 			SOLUTIONS:
 				1- color Z black;
 				2- recolor Z.parent, Z.uncle, Z.GP, Z = Z.GP;
@@ -602,7 +618,6 @@ namespace ft
 			2- w is BLACK and w.left and w.right are BLACK;
 			3- w is BLACK and w.left is RED and w.right is BLACK;
 			4- w is BLACK and w.right is RED;
-
 			SOLUTIONS:
 				1- recolor w and w.parent and rotate w.parent in the opposite direction of w then w = x.sibling;
 				2- w.color = RED and x = x.p

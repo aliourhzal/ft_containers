@@ -128,8 +128,20 @@ namespace	ft
 
 		/* Operations */
 
-		iterator 								find(const key_type& k) 				{ return (this->_tree.find(k)); }
-		const_iterator							find(const key_type& k)	const			{ return (this->_tree.find(k)); }
+		iterator	find	(const key_type& k)
+		{
+			NodePtr n = this->_tree.find(k);
+			if (n == this->_tree.NIL || n == this->_tree.STR)
+				return (this->_tree.NIL);
+			return (n);
+		}
+		const_iterator	find	(const key_type& k) const
+		{
+			NodePtr n = this->_tree.find(k);
+			if (n == this->_tree.NIL || n == this->_tree.STR)
+				return (this->_tree.NIL);
+			return (n);
+		}
 		size_type								count(const key_type& k) const			{ return (this->_tree.count_unique(k)); }
 		iterator								lower_bound( const key_type& k) 		{ return (this->_tree.lower_bound(k)); }
 		const_iterator							lower_bound( const key_type& k) const	{ return (this->_tree.lower_bound(k)); }

@@ -153,9 +153,9 @@ namespace	ft
 			NodePtr	target;
 
 			target = this->_tree.search(k);
-			if (target != this->_tree.NIL)
+			if (target != this->_tree.NIL && target != this->_tree.STR)
 				return (target->data.second);
-			throw(std::out_of_range("Element not Found 404"));
+			throw(std::out_of_range("map::at:  key not found"));
 		}
 
 		const mapped_type& at (const key_type& k) const
@@ -165,7 +165,7 @@ namespace	ft
 			target = this->_tree.search(k);
 			if (target != this->_tree.NIL)
 				return (target->data.second);
-			throw(std::out_of_range("Element not Found 404"));	
+			throw(std::out_of_range("map::at:  key not found"));	
 		}
 		
 		/* Observers */
@@ -175,8 +175,20 @@ namespace	ft
 
 		/* Operations */
 
-		iterator 								find		(const key_type& k) 		{ return (this->_tree.find(k)); }
-		const_iterator							find		(const key_type& k)	const	{ return (this->_tree.find(k)); }
+		iterator	find	(const key_type& k)
+		{
+			NodePtr n = this->_tree.find(k);
+			if (n == this->_tree.NIL || n == this->_tree.STR)
+				return (this->_tree.NIL);
+			return (n);
+		}
+		const_iterator	find	(const key_type& k) const
+		{
+			NodePtr n = this->_tree.find(k);
+			if (n == this->_tree.NIL || n == this->_tree.STR)
+				return (this->_tree.NIL);
+			return (n);
+		}
 		size_type								count		(const key_type& k) const	{ return (this->_tree.count_unique(k)); }
 		iterator								lower_bound	(const key_type& k) 		{ return (this->_tree.lower_bound(k)); }
 		const_iterator							lower_bound	(const key_type& k) const	{ return (this->_tree.lower_bound(k)); }
