@@ -117,7 +117,33 @@ namespace	ft
 				this->_tree.insert(*first);				
 		}
 
-		iterator insert (iterator position, const value_type& val) { return (insert(val).first);}
+		//iterator insert (iterator position, const value_type& val) { return (insert(val).first);}
+		iterator insert (iterator position, const value_type& val) { 
+			if ((_comp(val.first, this->_tree.root->data.first) && _comp(position->first, this->_tree.root->data.first))
+				|| (!_comp(val.first, this->_tree.root->data.first) && !_comp(position->first, this->_tree.root->data.first)))
+			{
+				NodePtr n = position.base();
+				NodePtr it;
+
+				if ((n != this->_tree.NIL && n != this->_tree.STR) && n->data != val
+					&& ((n->left != this->_tree.NIL && n->left != this->_tree.STR)
+					|| (n->right != this->_tree.NIL)))
+				{
+					this->_tree.insertHint(val, n);
+					n->left->data == val ? it = n->left : it = n->right;
+					return (it);
+				}
+				else
+					return (insert(val).first);
+			}
+			else
+				return (insert(val).first);
+		}
+
+		void printMap()
+		{
+			this->_tree.printTree();
+		}
 
 		void erase (iterator position) { this->_tree.delete_node(position->first); }
 

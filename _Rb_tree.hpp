@@ -39,7 +39,6 @@ namespace ft
 			typedef node_type*												nodePtr;
 		private:
 			size_type	_size;
-			nodePtr root;
 			value_compare	_comp;
 			node_allocator _alloc;
 
@@ -246,6 +245,7 @@ namespace ft
 		public:
 			nodePtr NIL;
 			nodePtr STR;
+			nodePtr root;
 			_Rb_tree(const value_compare& comp, const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
 			{
 				this->NIL = this->_alloc.allocate(1);
@@ -279,7 +279,7 @@ namespace ft
 			
 			void printHelper(nodePtr root, std::string indent, bool last)
 			{
-				if (root != this->NIL) {
+				if (root != this->NIL && root != this->	STR) {
 				std::cout << indent;
 				if (last) {
 					std::cout << "R----";
@@ -369,6 +369,28 @@ namespace ft
 							return 1;
 						}
 					}
+					new_Node->parent = y;
+					if (this->_comp(new_Node->data, y->data))
+						y->left = new_Node;
+					else
+						y->right = new_Node;
+					this->_maintain_Insert(new_Node);
+				}
+				this->_size++;
+				updateEdges();
+				return 0;
+			}
+
+			int	insertHint(value_type	data, nodePtr	y)
+			{
+				nodePtr	new_Node = newNode(data);
+				if (this->root == this->NIL)
+				{
+					new_Node->color = BLACK;
+					this->root = new_Node;
+				}
+				else
+				{
 					new_Node->parent = y;
 					if (this->_comp(new_Node->data, y->data))
 						y->left = new_Node;
