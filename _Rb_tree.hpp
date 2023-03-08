@@ -619,31 +619,3 @@ namespace ft
 		return temp;
 	};
 };
-
-/*
-	maintain tree after insertion (maintainInsert(x)):
-		4 scenarios of red black tree insertion violations:
-			1- Z is root;
-			2- Z.uncle is RED;
-			3- Z.uncle is BLACK(triangle)
-			4- Z.uncle is BLACK(line)
-			SOLUTIONS:
-				1- color Z black;
-				2- recolor Z.parent, Z.uncle, Z.GP, Z = Z.GP;
-				3- rotate Z.parent in the opposite direction of Z
-				4- rotate Z.GP in the opposite direction of Z and recolor the original parent and GP of Z  
-	
-	maintain tree after deletion (maintainDelete(x)):
-		let w = x.sibling;
-		4 scenarios of red black tree deletion violations:
-			1- w is RED;
-			2- w is BLACK and w.left and w.right are BLACK;
-			3- w is BLACK and w.left is RED and w.right is BLACK;
-			4- w is BLACK and w.right is RED;
-			SOLUTIONS:
-				1- recolor w and w.parent and rotate w.parent in the opposite direction of w then w = x.sibling;
-				2- w.color = RED and x = x.p
-				3- recolor w.left and w, rotate w in the same direction, w = x.sibling;
-				4- recolor w and w.parent and w.(the same direction of w) then rotate x.parent in the opposite direction of w
-		
-*/

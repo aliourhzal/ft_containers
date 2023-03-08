@@ -4,3 +4,5 @@ a.out
 .DS_Store
 .vscode/*
 ft_containers-unit-test
+y.cpp
+test.cpp

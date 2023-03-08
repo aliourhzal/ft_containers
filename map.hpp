@@ -117,7 +117,6 @@ namespace	ft
 				this->_tree.insert(*first);				
 		}
 
-		//iterator insert (iterator position, const value_type& val) { return (insert(val).first);}
 		iterator insert (iterator position, const value_type& val) { 
 			if ((_comp(val.first, this->_tree.root->data.first) && _comp(position->first, this->_tree.root->data.first))
 				|| (!_comp(val.first, this->_tree.root->data.first) && !_comp(position->first, this->_tree.root->data.first)))

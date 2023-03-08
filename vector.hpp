@@ -26,13 +26,13 @@ namespace ft
 			template <typename It>
 			__wrap_iter(const __wrap_iter<It>& x) : _current(x.base()){}
 		
-			T				base()							const	{return (this->_current);}
+			T				base()							const	{ return (this->_current);}
 			reference 		operator*()						const	{ return (*_current);}
 			pointer 		operator->()					const	{ return (_current);}
 			__wrap_iter& 	operator++()							{ ++_current; return (*this);}
-			__wrap_iter 	operator++(int)							{__wrap_iter _tmp(*this); ++_current; return (_tmp);}
+			__wrap_iter 	operator++(int)							{ __wrap_iter _tmp(*this); ++_current; return (_tmp); }
 			__wrap_iter& 	operator--()							{ --_current; return (*this);}
-			__wrap_iter 	operator--(int)							{__wrap_iter _tmp(*this); --_current; return (_tmp);}
+			__wrap_iter 	operator--(int)							{ __wrap_iter _tmp(*this); --_current; return (_tmp); }
 			__wrap_iter  	operator+ (difference_type _n)	const	{ __wrap_iter _tmp(*this); _tmp += _n; return (_tmp); }
 			__wrap_iter&  	operator+= (difference_type _n)			{ _current += _n; return (*this); }
 			__wrap_iter  	operator- (difference_type _n)	const	{ __wrap_iter _tmp(*this); _tmp -= _n; return (_tmp); }
