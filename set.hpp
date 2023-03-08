@@ -9,7 +9,6 @@
 
 namespace	ft
 {
-
 	template < class Key, class Compare = std::less<Key>, class Alloc = std::allocator<Key> >
 	class set
 	{

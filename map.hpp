@@ -9,14 +9,6 @@
 
 namespace	ft
 {
-
-	template <class Arg1, class Arg2, class Result>
-	struct binary_function {
-		typedef Arg1 first_argument_type;
-		typedef Arg2 second_argument_type;
-		typedef Result result_type;
-	};
-
 	template < class Key, class T, class Compare = std::less<Key>,class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map
 	{
@@ -33,7 +25,7 @@ namespace	ft
 			typedef	typename allocator_type::difference_type		difference_type;
 			typedef	typename allocator_type::size_type				size_type;
 
-			class value_compare : public ft::binary_function<value_type,value_type,bool>
+			class value_compare
 			{
 				friend class map;
 				protected:
